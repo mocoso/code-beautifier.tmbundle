@@ -1,7 +1,5 @@
 #!/usr/bin/ruby -w
 
-# Based on code by Paul Lutus (http://www.arachnoid.com/ruby/rubyBeautifier.html)
-
 module RBeautify
 
   def RBeautify.beautify_string(source, path = "")

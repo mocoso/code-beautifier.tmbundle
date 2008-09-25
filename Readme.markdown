@@ -12,3 +12,10 @@ Run this:
     git clone git://github.com/mocoso/code-beautifier.tmbundle.git Code\ Beautifier.tmbundle
 
 Then select 'Bundles > Bundle Editor > Reload Bundles' from Textmate's menus
+
+## Credits
+
+This was based on the [ruby beautifier script][rbs] by Paul Lutus and [Beautiful Ruby in Textmate][brit] by Tim Burks
+
+  [rbs]:http://www.arachnoid.com/ruby/rubyBeautifier.html
+  [brit]:http://blog.neontology.com/posts/2006/05/10/beautiful-ruby-in-textmate
