@@ -227,7 +227,7 @@ module RBeautify
     end
 
     def has_following_line?
-      @has_following_line ||= (previous_line && previous_line.has_following_line? && !has_non_comment_content?) || /[^\\]\\\s*$/.match(indent_relevant_content) || /(,|\.|\+|=\>)$/.match(indent_relevant_content)
+      @has_following_line ||= (previous_line && previous_line.has_following_line? && !has_non_comment_content?) || /[^\\]\\\s*$/.match(indent_relevant_content) || /(,|\.|\+|=\>|&&|\|\|)$/.match(indent_relevant_content)
     end
 
     def stripped
