@@ -11,8 +11,7 @@ source = nil
 dest = nil
 
 begin
-
-  require ENV['TM_SUPPORT_PATH'] + "/lib/exit_codes.rb"
+  require File.join(ENV['TM_SUPPORT_PATH'], 'lib', 'exit_codes')
   require File.join(ENV['TM_BUNDLE_SUPPORT'], 'lib', 'rbeautify')
 
   source = STDIN.read
