@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'spec'
 require File.dirname(__FILE__) + '/../lib/rbeautify.rb'
 
@@ -143,7 +144,7 @@ TEXT
       RBeautify.beautify_string(input).should == output
     end
   end
-  
+
   describe 'multiline strings' do
 
     it "should not change the indentation of multiline strings" do
@@ -168,9 +169,9 @@ end
 TEXT
       RBeautify.beautify_string(input).should == output
     end
-  
+
   end
-  
+
   describe RBeautify::RubyLine do
     
     it { RBeautify::RubyLine.new('def foo', nil).send(:indent?).should be_true }
