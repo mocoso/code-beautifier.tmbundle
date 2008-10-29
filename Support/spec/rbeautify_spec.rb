@@ -143,8 +143,24 @@ end
 TEXT
       RBeautify.beautify_string(input).should == output
     end
-  end
 
+    it 'should handle multiline code with escaped quotes in strings' do
+      input = <<TEXT
+def method_containing_multiline_code_with_strings
+a = "foo \\"\#{method}\\">" +
+"bar"
+end
+TEXT
+      output =  <<TEXT
+def method_containing_multiline_code_with_strings
+  a = "foo \\"\#{method}\\">" +
+    "bar"
+end
+TEXT
+      RBeautify.beautify_string(input).should == output
+    end
+  end
+      
   describe 'multiline strings' do
 
     it "should not change the indentation of multiline strings" do

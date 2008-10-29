@@ -114,15 +114,16 @@ module RBeautify
 
     # ignore regexp tests
     IGNORE_EXP = [
+      /\\"/,          # Ignore any escaped double quotes
       /\{[^\{]*?\}/,
       /\[[^\[]*?\]/,
       /'.*?'/,
-      /".*?"/,
+      /".*?"/,        # Ignore any quoted strings
       /\`.*?\`/,
       /\([^\(]*?\)/,
       /\/.*?\//,
       /%r(.).*?\1/,
-      /#[^\"]+$/ # ignore end-of-line comments
+      /#[^\"]+$/      # ignore end-of-line comments
     ]
 
     attr_writer :tabs
