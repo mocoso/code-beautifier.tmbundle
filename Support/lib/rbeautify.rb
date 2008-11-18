@@ -114,7 +114,7 @@ module RBeautify
 
     # ignore regexp tests
     IGNORE_EXP = [
-      /\\"/,          # Ignore any escaped double quotes
+      /\\"|\\'/,      # Ignore any escaped quotes
       /\{[^\{]*?\}/,
       /\[[^\[]*?\]/,
       /'.*?'/,
