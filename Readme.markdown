@@ -18,7 +18,10 @@ Then select 'Bundles > Bundle Editor > Reload Bundles' from Textmate's menus
 The 'Beautify all changed' command relies on
 
  - Your project using Git for source control
- - You installing the Grit gem (sudo gem install mojombo-grit)
+ - The Grit gem being installed
+
+        sudo gem sources -a http://gems.github.com/
+        sudo gem install mojombo-grit)
 
 ## Credits
 
