@@ -13,6 +13,13 @@ Run this:
 
 Then select 'Bundles > Bundle Editor > Reload Bundles' from Textmate's menus
 
+## Dependencies
+
+The 'Beautify all changed' command relies on
+
+ - Your project using Git for source control
+ - You installing the Grit gem (sudo gem install mojombo-grit)
+
 ## Credits
 
 This was based on the [ruby beautifier script][rbs] by Paul Lutus and [Beautiful Ruby in Textmate][brit] by Tim Burks

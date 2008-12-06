@@ -22,7 +22,7 @@
 
 module RBeautify
 
-  def RBeautify.beautify_string(source, path = "")
+  def RBeautify.beautify_string(source)
     dest = ""
     previous_line = nil
     line = nil
@@ -40,19 +40,22 @@ module RBeautify
     return dest
   end
 
-  def RBeautify.beautify_file(path)
+  def RBeautify.beautify_file(path, backup = false)
     if(path == '-') # stdin source
       source = STDIN.read
       print beautify_string(source,"stdin")
     else # named file source
       source = File.read(path)
-      dest = beautify_string(source,path)
+      dest = beautify_string(source)
       if(source != dest)
-        # make a backup copy
-        File.open(path + "~","w") { |f| f.write(source) }
+        if backup
+          # make a backup copy
+          File.open(path + "~","w") { |f| f.write(source) }
+        end
         # overwrite the original
         File.open(path,"w") { |f| f.write(dest) }
       end
+      return source != dest
     end
   end # beautify_file
 
