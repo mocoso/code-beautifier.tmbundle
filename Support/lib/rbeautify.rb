@@ -66,7 +66,7 @@ module RBeautify
   def RBeautify.main
     if(!ARGV[0])
       STDERR.puts "usage: Ruby filenames or \"-\" for stdin."
-        exit 0
+      exit 0
     end
     ARGV.each do |path|
       RBeautify.beautify_file(path)
