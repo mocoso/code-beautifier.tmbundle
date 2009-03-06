@@ -49,7 +49,7 @@ module RBeautify
       if @stack.nil?
         @stack = original_stack.dup
 
-        if ended_block
+        ended_blocks.each do |block|
           @stack.pop
         end
 
@@ -67,47 +67,56 @@ module RBeautify
 
     private
 
-    def ended_block
-      @ended_block ||= (!indent_relevant_content.empty? && original_stack.last && original_stack.last.end?(indent_relevant_content)) ? original_stack.last : nil
-    end
-
-    def format?
-      original_stack.last.nil? || original_stack.last.format?
-    end
-
-    def tabs
-      if ended_block && !ended_block.indent_end_line?
-        original_stack.size - 1
-      else
-        original_stack.size
-      end
-    end
-
-    def tab_string
-      @@tab_char * @@tab_size * tabs
-    end
-
-    def stripped
-      @stripped = content.strip
-    end
-
-    # Remove content from the string that does not have any relevance to
-    # indentation.
-    #
-    # Doing this enables the block matcher regexes to be much simpler
-    def indent_relevant_content
-      unless @indent_relevant_content.nil?
-        return @indent_relevant_content
+      def ended_blocks
+        if @ended_blocks.nil?
+          @ended_blocks = []
+          if !indent_relevant_content.empty? && original_stack.last && original_stack.last.end?(indent_relevant_content, original_stack)
+            @ended_blocks << original_stack.last
+            while @ended_blocks.last.end_is_implicit?
+              @ended_blocks << original_stack[original_stack.length - @ended_blocks.length - 1]
+            end
+          end
+        end
+        @ended_blocks
       end
 
-      @indent_relevant_content = stripped.dup
-      @@indent_irrelevant_content_matchers.each do |re|
-        # Replace the content with a dummy placeholder or nothing at all
-        @indent_relevant_content.gsub!(re.first, re.last ? ' | ' : '')
+      def format?
+        original_stack.last.nil? || original_stack.last.format?
       end
-      @indent_relevant_content.strip
 
-    end
+      def tabs
+        if !ended_blocks.empty? && !ended_blocks.last.indent_end_line?
+          original_stack.size - ended_blocks.size
+        else
+          original_stack.size
+        end
+      end
+
+      def tab_string
+        @@tab_char * @@tab_size * tabs
+      end
+
+      def stripped
+        @stripped = content.strip
+      end
+
+      # Remove content from the string that does not have any relevance to
+      # indentation.
+      #
+      # Doing this enables the block matcher regexes to be much simpler
+      def indent_relevant_content
+        unless @indent_relevant_content.nil?
+          return @indent_relevant_content
+        end
+
+        @indent_relevant_content = stripped.dup
+        @@indent_irrelevant_content_matchers.each do |re|
+          # Replace the content with a dummy placeholder or nothing at all
+          @indent_relevant_content.gsub!(re.first, re.last ? ' | ' : '')
+        end
+        @indent_relevant_content.strip
+
+      end
 
   end
 

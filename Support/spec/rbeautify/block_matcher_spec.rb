@@ -52,8 +52,8 @@ describe RBeautify::BlockMatcher do
       it { @matcher.block('def foo()', nil).should_not be_nil }
       it { @matcher.block('end', nil).should be_nil }
 
-      it { @matcher.should be_end('end') }
-      it { @matcher.should_not be_end('}') }
+      it { @matcher.should be_end('end', [@matcher]) }
+      it { @matcher.should_not be_end('}', [@matcher]) }
 
     end
 
@@ -66,8 +66,8 @@ describe RBeautify::BlockMatcher do
       it { @matcher.block('{', nil).should_not be_nil }
       it { @matcher.block('end', nil).should be_nil }
 
-      it { @matcher.should_not be_end('end') }
-      it { @matcher.should be_end('}') }
+      it { @matcher.should_not be_end('end', [@matcher]) }
+      it { @matcher.should be_end('}', [@matcher]) }
 
     end
 
@@ -80,8 +80,8 @@ describe RBeautify::BlockMatcher do
       it { @matcher.block('a = "', nil).should_not be_nil }
       it { @matcher.block('a = 2', nil).should be_nil }
 
-      it { @matcher.should be_end('"') }
-      it { @matcher.should_not be_end('a = 2') }
+      it { @matcher.should be_end('"', [@matcher]) }
+      it { @matcher.should_not be_end('a = 2', [@matcher]) }
 
     end
 
@@ -101,11 +101,27 @@ describe RBeautify::BlockMatcher do
 
       it { @matcher.block('foo :bar,', mock('block', :block_matcher => @matcher, :format? => true)).should be_nil }
 
-      it { @matcher.should be_end('a = 3') }
-      it { @matcher.should_not be_end('a = 3 &&') }
-      it { @matcher.should_not be_end('a = 3 +') }
-      it { @matcher.should_not be_end('foo :bar,') }
+      it { @matcher.should be_end('a = 3', [@matcher]) }
+      it { @matcher.should_not be_end('a = 3 &&', [@matcher]) }
+      it { @matcher.should_not be_end('a = 3 +', [@matcher]) }
+      it { @matcher.should_not be_end('foo :bar,', [@matcher]) }
     end
+
+    describe 'IMPLICIT_END_MATCHER' do
+
+      before(:each) do
+        @matcher = RBeautify::BlockMatcher::IMPLICIT_END_MATCHER
+      end
+
+      it { @matcher.block('private', nil).should_not be_nil }
+      it { @matcher.block('protected', nil).should_not be_nil }
+      it { @matcher.block('a = 3', nil).should be_nil }
+
+      it { @matcher.should_not be_end('a = 3', [@matcher]) }
+      it { @matcher.should_not be_end('a = 3', [mock('matcher', :end? => false), @matcher]) }
+      it { @matcher.should be_end('a = 3', [mock('matcher', :end? => true), @matcher]) }
+    end
+
 
   end
 

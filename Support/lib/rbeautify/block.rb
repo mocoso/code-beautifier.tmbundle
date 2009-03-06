@@ -4,8 +4,8 @@ module RBeautify
 
   class Block
 
-    def end?(string)
-      block_matcher.end?(string)
+    def end?(string, stack)
+      block_matcher.end?(string, stack)
     end
 
     def format?
@@ -14,6 +14,10 @@ module RBeautify
 
     def indent_end_line?
       block_matcher.indent_end_line?
+    end
+
+    def end_is_implicit?
+      block_matcher.end_is_implicit?
     end
 
   end

@@ -19,6 +19,7 @@ module RBeautify
       PROGRAM_END_MATCHER       = BlockMatcher.new(/^__END__$/, false, :format => false),
       MULTILINE_COMMENT_MATCHER = BlockMatcher.new(/^=begin/, /^=end/, :format => false),
       STANDARD_MATCHER          = BlockMatcher.new(/((^(module|class|def|unless|else))|\bdo)\b/, /^end\b/),
+      IMPLICIT_END_MATCHER      = BlockMatcher.new(/^(public|protected|private)$/, false, :end => :implicit),
       MORE_MATCHERS             = BlockMatcher.new(/(=\s*|^)(until|for|while)\b/, /^end\b/),
       BEGIN_MATCHERS            = BlockMatcher.new(/((=\s*|^)begin)|(^(ensure|rescue))\b/, /^(end|rescue|ensure)\b/),
       CASE_MATCHER              = BlockMatcher.new(/(((^| )case)|(\bwhen))\b/, /^(when|else|end)\b/),
@@ -44,18 +45,23 @@ module RBeautify
       end
     end
 
-    def end?(string)
-
-      if ends == false
-        # nil indicates no end to block
-        return false
-
-      elsif options[:negate_ends_match]
-        # false indicates should be opposite of match which started block
-        return !ends.match(string)
+    def end?(string, stack)
+      if end_is_implicit? && stack && !stack.empty?
+        return stack.last.end?(string, stack.slice(0, stack.length - 1))
 
       else
-        ends.match(string)
+        if ends == false
+          # nil indicates no end to block
+          return false
+
+        elsif options[:negate_ends_match]
+          # false indicates should be opposite of match which started block
+          return !ends.match(string)
+
+        else
+          ends.match(string)
+        end
+
       end
 
     end
@@ -71,6 +77,10 @@ module RBeautify
     def can_nest?(parent_block)
       parent_block.nil? ||
         (parent_block.format? && (options[:nest_except].nil? || !options[:nest_except].include?(parent_block.block_matcher)))
+    end
+
+    def end_is_implicit?
+      options[:end] == :implicit
     end
 
   end

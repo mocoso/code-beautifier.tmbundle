@@ -185,4 +185,28 @@ end
 
   end
 
+
+  describe 'implicitly ended blocks' do
+
+    it "should end indentation of implicit blocks" do
+      input = "
+class Foo
+private
+def method
+b = 5
+end
+end
+"
+      output = "
+class Foo
+  private
+    def method
+      b = 5
+    end
+end
+"
+      RBeautify.beautify_string(input).should == output
+    end
+
+  end
 end
