@@ -51,6 +51,7 @@ describe RBeautify::BlockMatcher do
       it { @matcher.block('module Foo', nil).should_not be_nil }
       it { @matcher.block('def foo()', nil).should_not be_nil }
       it { @matcher.block('end', nil).should be_nil }
+      it { @matcher.block('class Foo; end', nil).should be_nil }
 
       it { @matcher.should be_end('end', [@matcher]) }
       it { @matcher.should be_end('rescue', [@matcher]) }
