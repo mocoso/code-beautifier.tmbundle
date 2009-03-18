@@ -55,6 +55,7 @@ describe RBeautify::BlockMatcher do
 
       it { @matcher.should be_end('end', [@matcher]) }
       it { @matcher.should be_end('rescue', [@matcher]) }
+      it { @matcher.should be_end('ensure', [@matcher]) }
       it { @matcher.should_not be_end('}', [@matcher]) }
 
     end
