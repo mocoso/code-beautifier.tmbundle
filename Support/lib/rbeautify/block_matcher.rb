@@ -19,7 +19,7 @@ module RBeautify
       PROGRAM_END_MATCHER       = BlockMatcher.new(/^__END__$/, false, :format => false),
       MULTILINE_COMMENT_MATCHER = BlockMatcher.new(/^=begin/, /^=end/, :format => false),
       STANDARD_MATCHER          = BlockMatcher.new(/(((^(module|class|def|unless|else))|\bdo)\b)(?!.*\bend(\b|$))/, /^(end|rescue)\b/),
-      IMPLICIT_END_MATCHER      = BlockMatcher.new(/^(public|protected|private)$/, false, :end => :implicit),
+      IMPLICIT_END_MATCHER      = BlockMatcher.new(/^(public|protected|private)$/, /^(public|protected|private)$/, :end => :implicit),
       MORE_MATCHERS             = BlockMatcher.new(/(=\s*|^)(until|for|while)\b/, /^end\b/),
       BEGIN_MATCHERS            = BlockMatcher.new(/((=\s*|^)begin)|(^(ensure|rescue))\b/, /^(end|rescue|ensure)\b/),
       CASE_MATCHER              = BlockMatcher.new(/(((^| )case)|(\bwhen))\b/, /^(when|else|end)\b/),

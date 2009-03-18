@@ -121,6 +121,7 @@ describe RBeautify::BlockMatcher do
 
       it { @matcher.should_not be_end('a = 3', [@matcher]) }
       it { @matcher.should_not be_end('a = 3', [mock('matcher', :end? => false), @matcher]) }
+      it { @matcher.should be_end('protected', [@matcher]) }
       it { @matcher.should be_end('a = 3', [mock('matcher', :end? => true), @matcher]) }
     end
 
