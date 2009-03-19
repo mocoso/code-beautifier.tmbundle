@@ -68,13 +68,11 @@ module RBeautify
     private
 
       def ended_blocks
-        if @ended_blocks.nil?
-          @ended_blocks = []
-          if !indent_relevant_content.empty? && original_stack.last && original_stack.last.end?(indent_relevant_content, original_stack)
-            @ended_blocks << original_stack.last
-            while @ended_blocks.last.end_is_implicit?
-              @ended_blocks << original_stack[original_stack.length - @ended_blocks.length - 1]
-            end
+        unless @ended_blocks
+          if indent_relevant_content.empty? || original_stack.empty?
+            @ended_blocks = []
+          else
+            @ended_blocks = original_stack.last.ended_blocks(indent_relevant_content, original_stack.slice(0, original_stack.length - 1))
           end
         end
         @ended_blocks
@@ -85,10 +83,10 @@ module RBeautify
       end
 
       def tabs
-        if !ended_blocks.empty? && !ended_blocks.last.indent_end_line?
-          original_stack.size - ended_blocks.size
-        else
+        if ended_blocks.empty? || ended_blocks.last.indent_end_line?
           original_stack.size
+        else
+          original_stack.size - ended_blocks.size
         end
       end
 

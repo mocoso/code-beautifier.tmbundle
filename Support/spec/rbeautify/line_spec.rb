@@ -9,38 +9,47 @@ describe RBeautify::Line do
     end
 
     it 'should indent with existing indent' do
-      block = mock('block', :format? => true, :end? => false, :indent_end_line? => false, :block_matcher => RBeautify::BlockMatcher::STANDARD_MATCHER)
+      block = mock('block', :format? => true, :ended_blocks => [], :indent_end_line? => false, :block_matcher => RBeautify::BlockMatcher::STANDARD_MATCHER)
       RBeautify::Line.new(' a = 3 ', [block]).format.should == '  a = 3'
     end
 
     it 'leave empty lines blank' do
-      block = mock('block', :format? => true, :end? => false, :indent_end_line? => false)
+      block = mock('block', :format? => true, :ended_blocks => [], :indent_end_line? => false)
       RBeautify::Line.new('    ', [block]).format.should == ''
     end
 
     it 'should remove indent with match to end of block' do
-      original_stack = [mock('block', :format? => true, :end? => true, :indent_end_line? => false, :end_is_implicit? => false)]
+      current_block = mock('block', :format? => true, :indent_end_line? => false)
+      current_block.stub!(:ended_blocks => [current_block])
+      original_stack = [current_block]
       RBeautify::Line.new('  end ', original_stack).format.should == 'end'
     end
 
     it 'should remove double indent with match to end of block when end is implicit' do
-      original_stack = [mock('block', :end? => true, :end_is_implicit? => false, :indent_end_line? => false), mock('block', :format? => true, :end? => true, :end_is_implicit? => true, :indent_end_line? => false)]
+      surrounding_block = mock('block', :indent_end_line? => false)
+      current_block = mock('block', :format? => true, :indent_end_line? => false)
+      current_block.stub!(:ended_blocks => [current_block, surrounding_block])
+      original_stack = [surrounding_block, current_block]
       RBeautify::Line.new('  end ', original_stack).format.should == 'end'
     end
 
     it 'should leave indent with match to end of block (and indent last line)' do
-      original_stack = [mock('block', :format? => true, :end? => true, :indent_end_line? => true, :end_is_implicit? => false)]
+      current_block = mock('block', :format? => true, :indent_end_line? => true)
+      current_block.stub!(:ended_blocks => [current_block])
+      original_stack = [current_block]
       RBeautify::Line.new('  end ', original_stack).format.should == '  end'
     end
 
     it 'should leave indent with match to end of block (but no format)' do
-      original_stack = [mock('block', :format? => false, :end? => true)]
+      current_block = mock('block', :format? => false)
+      current_block.stub!(:ended_blocks => [current_block])
+      original_stack = [current_block]
       RBeautify::Line.new('  end', original_stack).format.should == '  end'
     end
 
     it 'should leave indent at old stack level with match of new block' do
-      old_block = mock('block', :format? => true, :end? => false, :indent_end_line? => false)
-      original_stack = [old_block]
+      current_block = mock('block', :format? => true, :indent_end_line? => false, :ended_blocks => [])
+      original_stack = [current_block]
       new_block = mock('new_block', :format? => true, :block_matcher => RBeautify::BlockMatcher::STANDARD_MATCHER)
       RBeautify::BlockMatcher::STANDARD_MATCHER.stub!(:block => new_block)
       RBeautify::Line.new('class Foo', original_stack).format.should == '  class Foo'
@@ -61,31 +70,38 @@ describe RBeautify::Line do
     end
 
     it 'should keep stack if no new block starts or ends' do
-      block = mock('block', :format? => true, :end? => false, :block_matcher => RBeautify::BlockMatcher::STANDARD_MATCHER)
+      block = mock('block', :format? => true, :ended_blocks => [], :block_matcher => RBeautify::BlockMatcher::STANDARD_MATCHER)
       RBeautify::Line.new(' a = 3 ', [block]).stack.should == [block]
     end
 
     it 'should pop block from stack with match to end of block' do
-      original_stack = [mock('block', :format? => true, :end? => true, :indent_end_line? => false, :end_is_implicit? => false)]
+      current_block = mock('block', :format? => true)
+      current_block.stub!(:ended_blocks => [current_block])
+      original_stack = [current_block]
       RBeautify::Line.new('  end ', original_stack).stack.should == []
     end
 
     it 'should pop block from stack with match to end of block when format is false' do
-      original_stack = [mock('block', :format? => false, :end? => true, :end_is_implicit? => false)]
+      current_block = mock('block', :format? => false)
+      current_block.stub!(:ended_blocks => [current_block])
+      original_stack = [current_block]
       RBeautify::Line.new('  end ', original_stack).stack.should == []
     end
 
     it 'should pop two blocks from stack with match to end of block when end is implicit' do
-      original_stack = [mock('block', :end? => true, :end_is_implicit? => false), mock('block', :format? => true, :end? => true, :end_is_implicit? => true)]
+      surrounding_block = mock('block')
+      current_block = mock('block', :format? => true)
+      current_block.stub!(:ended_blocks => [current_block, surrounding_block])
+      original_stack = [surrounding_block, current_block]
       RBeautify::Line.new('  end ', original_stack).stack.should == []
     end
 
     it 'should add new block to stack' do
-      old_block = mock('block', :format? => true, :end? => false, :indent_end_line? => false)
-      original_stack = [old_block]
+      current_block = mock('block', :format? => true, :ended_blocks => [])
+      original_stack = [current_block]
       new_block = mock('new_block', :format? => true, :block_matcher => RBeautify::BlockMatcher::STANDARD_MATCHER)
       RBeautify::BlockMatcher::STANDARD_MATCHER.stub!(:block => new_block)
-      RBeautify::Line.new('class Foo', original_stack).stack.should == [old_block, new_block]
+      RBeautify::Line.new('class Foo', original_stack).stack.should == [current_block, new_block]
     end
 
   end

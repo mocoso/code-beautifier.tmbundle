@@ -4,8 +4,8 @@ module RBeautify
 
   class Block
 
-    def end?(string, stack)
-      block_matcher.end?(string, stack)
+    def ended_blocks(string, stack)
+      block_matcher.ended_blocks(string, self, stack)
     end
 
     def format?

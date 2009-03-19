@@ -208,5 +208,33 @@ end
       RBeautify.beautify_string(input).should == output
     end
 
+    it "should end indentation of implicit blocks when another implicit block starts" do
+      input = "
+class Foo
+private
+def method
+b = 5
+end
+protected
+def another_method
+c = 5
+end
+end
+"
+      output = "
+class Foo
+  private
+    def method
+      b = 5
+    end
+  protected
+    def another_method
+      c = 5
+    end
+end
+"
+      RBeautify.beautify_string(input).should == output
+    end
+
   end
 end

@@ -45,6 +45,7 @@ describe RBeautify::BlockMatcher do
 
       before(:each) do
         @matcher = RBeautify::BlockMatcher::STANDARD_MATCHER
+        @current_block = RBeautify::Block.new(@matcher)
       end
 
       it { @matcher.block('class Foo', nil).should_not be_nil }
@@ -53,10 +54,10 @@ describe RBeautify::BlockMatcher do
       it { @matcher.block('end', nil).should be_nil }
       it { @matcher.block('class Foo; end', nil).should be_nil }
 
-      it { @matcher.should be_end('end', [@matcher]) }
-      it { @matcher.should be_end('rescue', [@matcher]) }
-      it { @matcher.should be_end('ensure', [@matcher]) }
-      it { @matcher.should_not be_end('}', [@matcher]) }
+      it { @matcher.ended_blocks('end', @current_block, []).should == [@current_block] }
+      it { @matcher.ended_blocks('rescue', @current_block, []).should == [@current_block] }
+      it { @matcher.ended_blocks('ensure', @current_block, []).should == [@current_block] }
+      it { @matcher.ended_blocks('}', @current_block, []).should == [] }
 
     end
 
@@ -64,13 +65,14 @@ describe RBeautify::BlockMatcher do
 
       before(:each) do
         @matcher = RBeautify::BlockMatcher::CURLY_BRACKET_MATCHER
+        @current_block = RBeautify::Block.new(@matcher)
       end
 
       it { @matcher.block('{', nil).should_not be_nil }
       it { @matcher.block('end', nil).should be_nil }
 
-      it { @matcher.should_not be_end('end', [@matcher]) }
-      it { @matcher.should be_end('}', [@matcher]) }
+      it { @matcher.ended_blocks('}', @current_block, []).should == [@current_block] }
+      it { @matcher.ended_blocks('end', @current_block, []).should == [] }
 
     end
 
@@ -78,13 +80,14 @@ describe RBeautify::BlockMatcher do
 
       before(:each) do
         @matcher = RBeautify::BlockMatcher::MULTILINE_STRING_MATCHER
+        @current_block = RBeautify::Block.new(@matcher)
       end
 
       it { @matcher.block('a = "', nil).should_not be_nil }
       it { @matcher.block('a = 2', nil).should be_nil }
 
-      it { @matcher.should be_end('"', [@matcher]) }
-      it { @matcher.should_not be_end('a = 2', [@matcher]) }
+      it { @matcher.ended_blocks('"', @current_block, []).should == [@current_block] }
+      it { @matcher.ended_blocks('a = 2', @current_block, []).should == [] }
 
     end
 
@@ -92,6 +95,7 @@ describe RBeautify::BlockMatcher do
 
       before(:each) do
         @matcher = RBeautify::BlockMatcher::MULTILINE_MATCHER
+        @current_block = RBeautify::Block.new(@matcher)
       end
 
       it { @matcher.block('a = 3 &&', nil).should_not be_nil }
@@ -104,28 +108,39 @@ describe RBeautify::BlockMatcher do
 
       it { @matcher.block('foo :bar,', mock('block', :block_matcher => @matcher, :format? => true)).should be_nil }
 
-      it { @matcher.should be_end('a = 3', [@matcher]) }
-      it { @matcher.should_not be_end('a = 3 &&', [@matcher]) }
-      it { @matcher.should_not be_end('a = 3 +', [@matcher]) }
-      it { @matcher.should_not be_end('foo :bar,', [@matcher]) }
+      it { @matcher.ended_blocks('a = 3', @current_block, []).should == [@current_block] }
+      it { @matcher.ended_blocks('a = 3 &&', @current_block, []).should == [] }
+      it { @matcher.ended_blocks('a = 3 +', @current_block, []).should == [] }
+      it { @matcher.ended_blocks('foo :bar,', @current_block, []).should == [] }
+
     end
 
     describe 'IMPLICIT_END_MATCHER' do
 
       before(:each) do
         @matcher = RBeautify::BlockMatcher::IMPLICIT_END_MATCHER
+        @current_block = RBeautify::Block.new(@matcher)
       end
 
       it { @matcher.block('private', nil).should_not be_nil }
       it { @matcher.block('protected', nil).should_not be_nil }
       it { @matcher.block('a = 3', nil).should be_nil }
 
-      it { @matcher.should_not be_end('a = 3', [@matcher]) }
-      it { @matcher.should_not be_end('a = 3', [mock('matcher', :end? => false), @matcher]) }
-      it { @matcher.should be_end('protected', [@matcher]) }
-      it { @matcher.should be_end('a = 3', [mock('matcher', :end? => true), @matcher]) }
-    end
+      it { @matcher.ended_blocks('protected', @current_block, []).should == [@current_block] }
+      it { @matcher.ended_blocks('a = 3', @current_block, []).should == [] }
 
+      it 'should return both if implicit end from next block in stack' do
+        surrounding_block = mock('block')
+        surrounding_block.stub!(:ended_blocks => [surrounding_block])
+        @matcher.ended_blocks('end', @current_block, [surrounding_block]).should == [@current_block, surrounding_block]
+      end
+
+      it 'should return none if no implicit end from next block in stack' do
+        surrounding_block = mock('block', :ended_blocks => [])
+        @matcher.ended_blocks('a = 3', @current_block, [surrounding_block]).should == []
+      end
+
+    end
 
   end
 

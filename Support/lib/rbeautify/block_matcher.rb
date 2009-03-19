@@ -45,25 +45,28 @@ module RBeautify
       end
     end
 
-    def end?(string, stack)
-      if end_is_implicit? && stack && !stack.empty?
-        return stack.last.end?(string, stack.slice(0, stack.length - 1))
+    def ended_blocks(string, current_block, stack)
+      blocks = []
 
-      else
-        if ends == false
-          # nil indicates no end to block
-          return false
+      unless ends == false
 
-        elsif options[:negate_ends_match]
-          # false indicates should be opposite of match which started block
-          return !ends.match(string)
-
+        if options[:negate_ends_match]
+          # indicates should be opposite of regex match
+          blocks = ends.match(string) ? [] : [current_block]
         else
-          ends.match(string)
+          blocks = ends.match(string) ? [current_block] : []
         end
 
       end
 
+      if end_is_implicit? && blocks.empty? && !stack.empty?
+        blocks = stack.last.ended_blocks(string, stack.slice(0, stack.length - 1))
+        unless blocks.empty?
+          blocks = [current_block].concat(blocks)
+        end
+      end
+
+      blocks
     end
 
     def indent_end_line?
