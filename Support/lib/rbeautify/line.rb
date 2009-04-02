@@ -16,9 +16,6 @@ module RBeautify
       [/".*?"/, true],        # Ignore contents of quoted strings
       [/\/.*?\//, true],      # Ignore contents of regexes
       [/#[^\"]+$/, false],    # Remove end-of-line comments
-      [/\{[^\{]*?\}/, true],  # Ignore contents of matched curly braces
-      [/\[[^\[]*?\]/, true],  # Ignore contents of matched square braces
-      [/\([^\(]*?\)/, true],  # Ignore contents of matched round braces
       [/\`.*?\`/, true]       # Ignore contents of matched backticks
     ]
 
@@ -46,47 +43,19 @@ module RBeautify
     end
 
     def stack
-      if @stack.nil?
-        @stack = original_stack.dup
-
-        ended_blocks.each do |block|
-          @stack.pop
-        end
-
-        if format?
-          BlockMatcher::MATCHERS.each do |matcher|
-            if block = matcher.block(indent_relevant_content, @stack.last)
-              @stack.push(block)
-            end
-          end
-        end
-      end
-
-      @stack
+      @stack ||= BlockMatcher.calculate_stack(indent_relevant_content, original_stack)
     end
 
     private
-
-      def ended_blocks
-        unless @ended_blocks
-          if indent_relevant_content.empty? || original_stack.empty?
-            @ended_blocks = []
-          else
-            @ended_blocks = original_stack.last.ended_blocks(indent_relevant_content, original_stack.slice(0, original_stack.length - 1))
-          end
-        end
-        @ended_blocks
-      end
-
       def format?
         original_stack.last.nil? || original_stack.last.format?
       end
 
       def tabs
-        if ended_blocks.empty? || ended_blocks.last.indent_end_line?
+        if (original_stack.size > stack.size) && (original_stack.last && original_stack.last.indent_end_line?)
           original_stack.size
         else
-          original_stack.size - ended_blocks.size
+          (original_stack & stack).size
         end
       end
 

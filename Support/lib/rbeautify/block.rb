@@ -1,11 +1,15 @@
 module RBeautify
 
-  Block = Struct.new(:block_matcher)
-
   class Block
 
-    def ended_blocks(string, stack)
-      block_matcher.ended_blocks(string, self, stack)
+    attr_accessor :block_matcher
+
+    def initialize(block_matcher)
+      self.block_matcher = block_matcher
+    end
+
+    def after_end_match(string, stack)
+      block_matcher.after_end_match(string, stack)
     end
 
     def format?

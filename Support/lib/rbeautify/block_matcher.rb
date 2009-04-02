@@ -16,19 +16,19 @@ module RBeautify
     end
 
     MATCHERS = [
-      PROGRAM_END_MATCHER       = BlockMatcher.new(/^__END__$/, false, :format => false),
-      MULTILINE_COMMENT_MATCHER = BlockMatcher.new(/^=begin/, /^=end/, :format => false),
-      STANDARD_MATCHER          = BlockMatcher.new(/(((^(module|class|def|unless|else))|\bdo)\b)(?!.*\bend(\b|$))/, /^(end|rescue|ensure)\b/),
-      IMPLICIT_END_MATCHER      = BlockMatcher.new(/^(public|protected|private)$/, /^(public|protected|private)$/, :end => :implicit),
-      MORE_MATCHERS             = BlockMatcher.new(/(=\s*|^)(until|for|while)\b/, /^end\b/),
-      BEGIN_MATCHERS            = BlockMatcher.new(/((=\s*|^)begin)|(^(ensure|rescue))\b/, /^(end|rescue|ensure)\b/),
-      CASE_MATCHER              = BlockMatcher.new(/(((^| )case)|(\bwhen))\b/, /^(when|else|end)\b/),
-      IF_MATCHER                = BlockMatcher.new(/((^(if|elsif))|(\bthen))\b/, /^(elsif|else|end)\b/),
-      CURLY_BRACKET_MATCHER     = BlockMatcher.new(/\{[^\}]*$/, /^[^\{]*\}/),
-      ROUND_BRACKET_MATCHER     = BlockMatcher.new(/\([^\)]*$/, /^[^\(]*\)/),
-      SQUARE_BRACKET_MATCHER    = BlockMatcher.new(/\[[^\]]*$/, /^[^\[]*\]/),
-      MULTILINE_STRING_MATCHER  = BlockMatcher.new(/"/, /"/, :format => false),
-      MULTILINE_MATCHER         = BlockMatcher.new(
+      PROGRAM_END_MATCHER         = BlockMatcher.new(/^__END__$/, false, :format => false),
+      MULTILINE_COMMENT_MATCHER   = BlockMatcher.new(/^=begin/, /^=end/, :format => false),
+      STANDARD_MATCHER            = BlockMatcher.new(/((^(module|class|def|unless|else))|\bdo)\b/, /(^|;\s*)(end|rescue|ensure)\b/),
+      IMPLICIT_END_MATCHER        = BlockMatcher.new(/^(public|protected|private)$/, /^(public|protected|private)$/, :end => :implicit),
+      MORE_MATCHERS               = BlockMatcher.new(/(=\s+|^)(until|for|while)\b/, /(^|;\s*)end\b/),
+      BEGIN_MATCHERS              = BlockMatcher.new(/((=\s+|^)begin)|(^(ensure|rescue))\b/, /(^|;\s*)(end|rescue|ensure)\b/),
+      IF_AND_CASE_MATCHER         = BlockMatcher.new(/(((^|;\s*)(if|elsif|case))|(\b(when|then)))\b/, /((^|;\s*)(elsif|else|end)|\b(when|then))\b/),
+      CURLY_BRACKET_MATCHER       = BlockMatcher.new(/\{/, /\}/),
+      ROUND_BRACKET_MATCHER       = BlockMatcher.new(/\(/, /\)/),
+      SQUARE_BRACKET_MATCHER      = BlockMatcher.new(/\[/, /\]/),
+      DOUBLE_QUOTE_STRING_MATCHER = BlockMatcher.new(/"/, /"/, :format => false),
+      SINGLE_QUOTE_STRING_MATCHER = BlockMatcher.new(/'/, /'/, :format => false),
+      MULTILINE_MATCHER           = BlockMatcher.new(
         /(,|\.|\+|-|=\>|&&|\|\||\\|==)$/,
         nil,
         :indent_end_line => true,
@@ -37,36 +37,46 @@ module RBeautify
       )
     ]
 
-    def block(string, parent_block)
-      if can_nest?(parent_block) && starts.match(string)
-        Block.new(self)
-      else
-        nil
-      end
-    end
+    class << self
+      def calculate_stack(string, stack = [])
+        stack = stack.dup
+        current_block = stack.last
+        new_block = nil
+        block_ended = false
 
-    def ended_blocks(string, current_block, stack)
-      blocks = []
-
-      unless ends == false
-
-        if options[:negate_ends_match]
-          # indicates should be opposite of regex match
-          blocks = ends.match(string) ? [] : [current_block]
+        if current_block
+          after_match = current_block.after_end_match(string, stack)
+          block_ended = true if after_match
         else
-          blocks = ends.match(string) ? [current_block] : []
+          after_match = nil
         end
 
-      end
-
-      if end_is_implicit? && blocks.empty? && !stack.empty?
-        blocks = stack.last.ended_blocks(string, stack.slice(0, stack.length - 1))
-        unless blocks.empty?
-          blocks = [current_block].concat(blocks)
+        MATCHERS.each do |matcher|
+          if matcher.can_nest?(current_block)
+            this_after_match = matcher.after_start_match(string)
+            if this_after_match && (after_match.nil? || after_match.length <= this_after_match.length)
+              if block_ended && after_match.length < this_after_match.length
+                block_ended = false
+              end
+              after_match = this_after_match
+              new_block = Block.new(matcher)
+            end
+          end
         end
+
+        if after_match
+          if block_ended
+            while ((block = stack.pop) && block.end_is_implicit? && !block.block_matcher.explicit_end_match?(string)); end
+          end
+          if new_block
+            stack << new_block
+          end
+          stack = calculate_stack(after_match, stack)
+        end
+
+        stack
       end
 
-      blocks
     end
 
     def indent_end_line?
@@ -85,6 +95,42 @@ module RBeautify
     def end_is_implicit?
       options[:end] == :implicit
     end
+
+    def explicit_end_match?(string)
+      !explicit_after_end_match(string).nil?
+    end
+
+    def after_end_match(string, stack)
+      after_match = explicit_after_end_match(string)
+
+      if end_is_implicit? && after_match.nil? && !stack.empty?
+        after_match = stack.last.after_end_match(string, stack.slice(0, stack.length - 1))
+      end
+
+      after_match
+    end
+
+    def after_start_match(string)
+      !string.empty? && (match = starts.match(string)) && match.post_match
+    end
+
+    private
+      def explicit_after_end_match(string)
+        after_match = nil
+
+        unless ends == false || string.empty?
+
+          if match = ends.match(string)
+            unless options[:negate_ends_match]
+              after_match = match.post_match
+            end
+          elsif options[:negate_ends_match]
+            after_match = string
+          end
+
+        end
+        after_match
+      end
 
   end
 

@@ -2,6 +2,29 @@ require 'spec_helper.rb'
 
 describe RBeautify do
 
+  describe 'if else end' do
+
+    it 'should indent if else end statement' do
+      input = "
+if foo
+bar = true
+else
+bar = false
+end
+"
+      output = "
+if foo
+  bar = true
+else
+  bar = false
+end
+"
+
+      RBeautify.beautify_string(input).should == output
+    end
+
+  end
+
   describe 'when' do
 
     it 'should not indent case statement' do
@@ -11,6 +34,9 @@ when 1
 bar = 'some string'
 when 2
 bar = 'some other string'
+when 3 then bar = '3'
+else
+bar = '4'
 end
 "
       output = "
@@ -19,6 +45,9 @@ when 1
   bar = 'some string'
 when 2
   bar = 'some other string'
+when 3 then bar = '3'
+else
+  bar = '4'
 end
 "
       RBeautify.beautify_string(input).should == output
@@ -49,6 +78,7 @@ Comment
 =end
 foo
 "
+
       RBeautify.beautify_string(input).should == input
     end
 
@@ -71,6 +101,7 @@ def method_with_multiline_method_call
     third_arg
 end
 "
+
       RBeautify.beautify_string(input).should == output
     end
 
@@ -188,27 +219,7 @@ end
 
   describe 'implicitly ended blocks' do
 
-    it "should end indentation of implicit blocks" do
-      input = "
-class Foo
-private
-def method
-b = 5
-end
-end
-"
-      output = "
-class Foo
-  private
-    def method
-      b = 5
-    end
-end
-"
-      RBeautify.beautify_string(input).should == output
-    end
-
-    it "should end indentation of implicit blocks when another implicit block starts" do
+    it "should end indentation of implicit blocks when another implicit block starts or when surrounding block ends" do
       input = "
 class Foo
 private
