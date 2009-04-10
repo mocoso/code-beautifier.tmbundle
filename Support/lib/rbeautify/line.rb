@@ -6,11 +6,12 @@ module RBeautify
     @@tab_char = " "
     @@tab_size = 2
 
-    # ignore regexp tests
-    #
     # TODO: Replace with proper inline blockmatchers so that blocks are matched
     # even if they begin and end on the same line
+    #
+    # Howver these are currently required because ruby regex does not support look behinds
     @@indent_irrelevant_content_matchers = [
+      [/\\/, false],          # Remove double escapes
       [/\\"|\\'/, false],     # Remove escaped quotes
       [/'.*?'/, true],
       [/".*?"/, true],        # Ignore contents of quoted strings
