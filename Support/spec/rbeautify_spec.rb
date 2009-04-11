@@ -127,6 +127,25 @@ end
       RBeautify.beautify_string(input).should == output
     end
 
+    it "should indent method call with bracketed continuing line argument" do
+      pending 'implementation'
+      input = "
+def method_with_multiline_method_call
+multiline_method_call(foo,
+bar,
+foobar)
+end
+"
+      output = "
+def method_with_multiline_method_call
+  multiline_method_call(foo,
+    bar,
+    foobar)
+end
+"
+      RBeautify.beautify_string(input).should == output
+    end
+
     it "should indent method call with multiline arguments (implicit brackets)" do
       input = "
 def method_with_multiline_method_call
@@ -196,18 +215,18 @@ end
       input = "
 def method_containing_long_string
 a = \"
-Some text across multiple lines
-And another line
-\"
+      Some text across multiple lines
+      And another line
+      \"
 b = 5
 end
 "
       output = "
 def method_containing_long_string
   a = \"
-Some text across multiple lines
-And another line
-\"
+      Some text across multiple lines
+      And another line
+      \"
   b = 5
 end
 "
