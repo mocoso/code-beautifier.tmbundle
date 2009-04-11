@@ -121,25 +121,27 @@ describe RBeautify::BlockMatcher do
 
     end
 
-    describe 'MULTILINE_MATCHER' do
+    describe 'CONTINUING_LINE_MATCHER' do
 
       before(:each) do
-        @matcher = RBeautify::BlockMatcher::MULTILINE_MATCHER
+        @matcher = RBeautify::BlockMatcher::CONTINUING_LINE_MATCHER
         @current_block = RBeautify::Block.new(@matcher)
       end
 
+      it { @matcher.after_start_match('foo :bar,').should == '' }
       it { @matcher.after_start_match('a = 3 &&').should == '' }
       it { @matcher.after_start_match('a = 3 ||').should == '' }
       it { @matcher.after_start_match('a = 3 +').should == '' }
       it { @matcher.after_start_match('a = 3 -').should == '' }
-      it { @matcher.after_start_match('foo :bar,').should == '' }
       it { @matcher.after_start_match('a \\').should == '' }
+      it { @matcher.after_start_match('a ?').should == '' }
       it { @matcher.after_start_match('a = 3').should be_nil }
+      it { @matcher.after_start_match('a = foo.bar?').should be_nil }
 
       it { @matcher.after_end_match('a = 3', [@current_block]).should == 'a = 3' }
+      it { @matcher.after_end_match('foo :bar,', [@current_block]).should be_nil }
       it { @matcher.after_end_match('a = 3 &&', [@current_block]).should be_nil }
       it { @matcher.after_end_match('a = 3 +', [@current_block]).should be_nil }
-      it { @matcher.after_end_match('foo :bar,', [@current_block]).should be_nil }
 
     end
 
@@ -168,7 +170,7 @@ describe RBeautify::BlockMatcher do
       end
 
     end
-    
+
     describe 'ROUND_BRACKET_MATCHER' do
 
       before(:each) do

@@ -30,7 +30,7 @@ describe RBeautify::Line do
     end
 
     it 'should leave indent with match to end of block (and indent last line)' do
-      current_block = RBeautify::Block.new(RBeautify::BlockMatcher::MULTILINE_MATCHER)
+      current_block = RBeautify::Block.new(RBeautify::BlockMatcher::CONTINUING_LINE_MATCHER)
       RBeautify::Line.new('  foo ', [current_block]).format.should == '  foo'
     end
 

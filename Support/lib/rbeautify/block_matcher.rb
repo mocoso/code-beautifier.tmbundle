@@ -28,8 +28,8 @@ module RBeautify
       SQUARE_BRACKET_MATCHER      = BlockMatcher.new(/\[/, /\]/),
       DOUBLE_QUOTE_STRING_MATCHER = BlockMatcher.new(/"/, /"/, :format => false),
       SINGLE_QUOTE_STRING_MATCHER = BlockMatcher.new(/'/, /'/, :format => false),
-      MULTILINE_MATCHER           = BlockMatcher.new(
-        /(,|\.|\+|-|=\>|&&|\|\||\\|==)$/,
+      CONTINUING_LINE_MATCHER     = BlockMatcher.new(
+        /(,|\.|\+|-|=\>|&&|\|\||\\|==|\s\?|:)$/,
         nil,
         :indent_end_line => true,
         :negate_ends_match => true,
