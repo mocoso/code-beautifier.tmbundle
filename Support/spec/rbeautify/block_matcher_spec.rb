@@ -133,7 +133,7 @@ describe RBeautify::BlockMatcher do
       it { @matcher.after_start_match('a = 3 ||').should == '' }
       it { @matcher.after_start_match('a = 3 +').should == '' }
       it { @matcher.after_start_match('a = 3 -').should == '' }
-      it { @matcher.after_start_match('a \\').should == '' }
+      it { @matcher.after_start_match("a \\").should == '' }
       it { @matcher.after_start_match('a ?').should == '' }
       it { @matcher.after_start_match('a = 3').should be_nil }
       it { @matcher.after_start_match('a = foo.bar?').should be_nil }
@@ -142,6 +142,7 @@ describe RBeautify::BlockMatcher do
       it { @matcher.after_end_match('foo :bar,', [@current_block]).should be_nil }
       it { @matcher.after_end_match('a = 3 &&', [@current_block]).should be_nil }
       it { @matcher.after_end_match('a = 3 +', [@current_block]).should be_nil }
+      it { @matcher.after_end_match("a \\", [@current_block]).should be_nil }
 
     end
 

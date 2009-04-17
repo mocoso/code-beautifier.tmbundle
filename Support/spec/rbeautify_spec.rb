@@ -89,19 +89,20 @@ foo
     it "should indent lines after first of multiline code" do
       input = "
 def method_with_multiline_method_call
-multiline_method_call first_arg, \\
-second_arg, \\
+multiline_method_call \\
+first_arg,
+second_arg,
 third_arg
 end
 "
       output = "
 def method_with_multiline_method_call
-  multiline_method_call first_arg, \\
-    second_arg, \\
+  multiline_method_call \\
+    first_arg,
+    second_arg,
     third_arg
 end
 "
-
       RBeautify.beautify_string(input).should == output
     end
 

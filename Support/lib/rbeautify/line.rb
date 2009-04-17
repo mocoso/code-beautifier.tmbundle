@@ -11,7 +11,7 @@ module RBeautify
     #
     # Howver these are currently required because ruby regex does not support look behinds
     @@indent_irrelevant_content_matchers = [
-      [/\\/, false],          # Remove double escapes
+      [/\\\\/, false],        # Remove double escapes
       [/\\"|\\'/, false],     # Remove escaped quotes
       [/'.*?'/, true],
       [/".*?"/, true],        # Ignore contents of quoted strings
