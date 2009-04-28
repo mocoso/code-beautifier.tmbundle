@@ -119,12 +119,8 @@ describe RBeautify::Line do
     describe '#indent_relevant_content' do
       it { RBeautify::Line.new('     def foo \\').send(:indent_relevant_content).should == 'def foo \\' }
       it { RBeautify::Line.new('     def foo # some comment').send(:indent_relevant_content).should == 'def foo' }
-      it { RBeautify::Line.new('     "some string"     ').send(:indent_relevant_content).should == '|' }
-      it { RBeautify::Line.new('     "some string containing escaped backslash\\\\"     ').send(:indent_relevant_content).should == '|' }
-      it { RBeautify::Line.new('     /\\"/     ').send(:indent_relevant_content).should == '|' }
-      it { RBeautify::Line.new('     describe \'#block\' do    ').send(:indent_relevant_content).should == 'describe  |  do' }
       it { RBeautify::Line.new('     a = 1    ').send(:indent_relevant_content).should == 'a = 1' }
-      it { RBeautify::Line.new('     "   ').send(:indent_relevant_content).should == '"' }
+      it { RBeautify::Line.new("     describe '#foo'   ").send(:indent_relevant_content).should == "describe '#foo'" }
     end
 
     describe '#stripped' do

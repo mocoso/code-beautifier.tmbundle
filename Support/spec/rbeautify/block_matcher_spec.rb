@@ -5,7 +5,7 @@ describe RBeautify::BlockMatcher do
   describe '.calculate_stack' do
 
     it 'should not match de' do
-      RBeautify::BlockMatcher.calculate_stack('foo').should be_empty
+      RBeautify::BlockMatcher.calculate_stack('de foo').should be_empty
     end
 
     it 'should match def' do
@@ -22,7 +22,8 @@ describe RBeautify::BlockMatcher do
 
     it 'should match nested blocks (taking into account ends)' do
       RBeautify::BlockMatcher.calculate_stack('def foo(bar = {})').size.should == 1
-      RBeautify::BlockMatcher.calculate_stack('def foo(bar = {})').first.block_matcher.should == RBeautify::BlockMatcher::STANDARD_MATCHER
+      RBeautify::BlockMatcher.calculate_stack('def foo(bar = {})').first.block_matcher.should ==
+        RBeautify::BlockMatcher::STANDARD_MATCHER
     end
 
   end
@@ -113,10 +114,30 @@ describe RBeautify::BlockMatcher do
         @current_block = RBeautify::Block.new(@matcher)
       end
 
-      it { @matcher.after_start_match('a = "foo').should == 'foo' }
+      it { @matcher.after_start_match('a = "foo"').should == 'foo"' }
       it { @matcher.after_start_match('a = 2').should be_nil }
 
       it { @matcher.after_end_match(' bar"', [@current_block]).should == '' }
+      it { @matcher.after_end_match(' " + bar + "', [@current_block]).should == ' + bar + "' }
+      it { @matcher.after_end_match('\\\\"', [@current_block]).should == '' }
+      it { @matcher.after_end_match('\\" still within string"', [@current_block]).should == '' }
+      it { @matcher.after_end_match('a = 2', [@current_block]).should be_nil }
+      it { @matcher.after_end_match('\\"', [@current_block]).should be_nil }
+      it { @matcher.after_end_match('\\\\\\"', [@current_block]).should be_nil }
+
+    end
+
+    describe 'SINGLE_QUOTE_STRING_MATCHER' do
+
+      before(:each) do
+        @matcher = RBeautify::BlockMatcher::SINGLE_QUOTE_STRING_MATCHER
+        @current_block = RBeautify::Block.new(@matcher)
+      end
+
+      it { @matcher.after_start_match("describe '#foo?' do").should == "#foo?' do" }
+      it { @matcher.after_start_match('a = 2').should be_nil }
+
+      it { @matcher.after_end_match("#foo?' do", [@current_block]).should == ' do' }
       it { @matcher.after_end_match('a = 2', [@current_block]).should be_nil }
 
     end

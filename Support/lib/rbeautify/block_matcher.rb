@@ -26,8 +26,10 @@ module RBeautify
       CURLY_BRACKET_MATCHER       = BlockMatcher.new(/\{/, /\}/),
       ROUND_BRACKET_MATCHER       = BlockMatcher.new(/\(/, /\)/),
       SQUARE_BRACKET_MATCHER      = BlockMatcher.new(/\[/, /\]/),
-      DOUBLE_QUOTE_STRING_MATCHER = BlockMatcher.new(/"/, /"/, :format => false),
-      SINGLE_QUOTE_STRING_MATCHER = BlockMatcher.new(/'/, /'/, :format => false),
+      DOUBLE_QUOTE_STRING_MATCHER = BlockMatcher.new(/"/, /"/, :format => false, :escape_character => true),
+      SINGLE_QUOTE_STRING_MATCHER = BlockMatcher.new(/'/, /'/, :format => false, :escape_character => true),
+      REGEX_MATCHER               = BlockMatcher.new(/\//, /\//, :format => false, :escape_character => true),
+      BACK_TICK_MATCHER           = BlockMatcher.new(/`/, /`/, :format => false, :escape_character => true),
       CONTINUING_LINE_MATCHER     = BlockMatcher.new(
         /(,|\.|\+|-|=\>|&&|\|\||\\|==|\s\?|:)$/,
         nil,
@@ -76,7 +78,6 @@ module RBeautify
 
         stack
       end
-
     end
 
     def indent_end_line?
@@ -114,6 +115,12 @@ module RBeautify
       !string.empty? && (match = starts.match(string)) && match.post_match
     end
 
+    # True if blocks can contain the escape character \ which needs to be
+    # checked for on end match
+    def escape_character?
+      options[:escape_character] == true
+    end
+
     private
       def explicit_after_end_match(string)
         after_match = nil
@@ -122,7 +129,14 @@ module RBeautify
 
           if match = ends.match(string)
             unless options[:negate_ends_match]
-              after_match = match.post_match
+              if options[:escape_character] &&
+                  ((escape_chars = match.pre_match.match(/\\*$/)) && (escape_chars[0].size % 2 == 1))
+                # If there are an odd number of escape characters just before
+                # the match then this match should be skipped
+                return explicit_after_end_match(match.post_match)
+              else
+                after_match = match.post_match
+              end
             end
           elsif options[:negate_ends_match]
             after_match = string
