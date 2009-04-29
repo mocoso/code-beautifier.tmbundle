@@ -30,7 +30,7 @@ module RBeautify
     end
 
     def stack
-      @stack ||= BlockMatcher.calculate_stack(indent_relevant_content, original_stack)
+      @stack ||= BlockMatcher.calculate_stack(stripped, original_stack)
     end
 
     private
@@ -52,14 +52,6 @@ module RBeautify
 
       def stripped
         @stripped = content.strip
-      end
-
-      # Remove comments from the end of the string because they have no
-      # relevance to indentation.
-      def indent_relevant_content
-        # TODO: improve this.
-        # It very crude and quotes in an end of line comment are likely to break it.
-        @indent_relevant_content ||= stripped.dup.gsub(/#[^\"']+$/,  '').strip
       end
 
   end

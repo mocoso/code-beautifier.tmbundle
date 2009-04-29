@@ -156,14 +156,18 @@ describe RBeautify::BlockMatcher do
       it { @matcher.after_start_match('a = 3 -').should == '' }
       it { @matcher.after_start_match("a \\").should == '' }
       it { @matcher.after_start_match('a ?').should == '' }
+      it { @matcher.after_start_match('a ? # some comment').should == '' }
       it { @matcher.after_start_match('a = 3').should be_nil }
       it { @matcher.after_start_match('a = foo.bar?').should be_nil }
+      it { @matcher.after_start_match('# just a comment').should be_nil }
 
       it { @matcher.after_end_match('a = 3', [@current_block]).should == 'a = 3' }
       it { @matcher.after_end_match('foo :bar,', [@current_block]).should be_nil }
       it { @matcher.after_end_match('a = 3 &&', [@current_block]).should be_nil }
       it { @matcher.after_end_match('a = 3 +', [@current_block]).should be_nil }
       it { @matcher.after_end_match("a \\", [@current_block]).should be_nil }
+      it { @matcher.after_end_match('# just a comment', [@current_block]).should be_nil }
+      it { @matcher.after_end_match('#', [@current_block]).should be_nil }
 
     end
 
@@ -179,6 +183,7 @@ describe RBeautify::BlockMatcher do
       it { @matcher.after_start_match('a = 3').should be_nil }
 
       it { @matcher.after_end_match('protected', [@current_block]).should == '' }
+      it { @matcher.after_end_match('protected # some comment', [@current_block]).should == '' }
       it { @matcher.after_end_match('a = 3', [@current_block]).should be_nil }
 
       it 'should return both if implicit end from next block in stack' do
@@ -205,6 +210,22 @@ describe RBeautify::BlockMatcher do
 
       it { @matcher.after_end_match(')', [@current_block]).should == '' }
       it { @matcher.after_end_match('a = 3', [@current_block]).should be_nil }
+
+    end
+
+    describe 'COMMENT_MATCHER' do
+
+      before(:each) do
+        @matcher = RBeautify::BlockMatcher::COMMENT_MATCHER
+        @current_block = RBeautify::Block.new(@matcher)
+      end
+
+      it { @matcher.after_start_match('anything # comment').should == ' comment'}
+      it { @matcher.after_start_match('anything else').should be_nil }
+      it { @matcher.after_start_match('#').should == '' }
+
+      it { @matcher.after_end_match('anything', [@current_block]).should == '' }
+      it { @matcher.after_end_match('', [@current_block]).should == '' }
 
     end
 

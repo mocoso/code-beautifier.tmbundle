@@ -19,7 +19,7 @@ module RBeautify
       PROGRAM_END_MATCHER         = BlockMatcher.new(/^__END__$/, false, :format => false),
       MULTILINE_COMMENT_MATCHER   = BlockMatcher.new(/^=begin/, /^=end/, :format => false),
       STANDARD_MATCHER            = BlockMatcher.new(/((^(module|class|def|else))|\bdo)\b/, /(^|;\s*)(end|rescue|ensure)\b/),
-      IMPLICIT_END_MATCHER        = BlockMatcher.new(/^(public|protected|private)$/, /^(public|protected|private)$/, :end => :implicit),
+      IMPLICIT_END_MATCHER        = BlockMatcher.new(/^(public|protected|private)$/, /^(public|protected|private)(\s*)?(#.*)?$/, :end => :implicit),
       MORE_MATCHERS               = BlockMatcher.new(/(=\s+|^)(until|for|while)\b/, /(^|;\s*)end\b/),
       BEGIN_MATCHERS              = BlockMatcher.new(/((=\s+|^)begin)|(^(ensure|rescue))\b/, /(^|;\s*)(end|rescue|ensure)\b/),
       IF_AND_CASE_MATCHER         = BlockMatcher.new(/(((^|;\s*)(if|elsif|case|unless))|(\b(when|then)))\b/, /((^|;\s*)(elsif|else|end)|\b(when|then))\b/),
@@ -30,9 +30,15 @@ module RBeautify
       SINGLE_QUOTE_STRING_MATCHER = BlockMatcher.new(/'/, /'/, :format => false, :escape_character => true),
       REGEX_MATCHER               = BlockMatcher.new(/\//, /\//, :format => false, :escape_character => true),
       BACK_TICK_MATCHER           = BlockMatcher.new(/`/, /`/, :format => false, :escape_character => true),
+      COMMENT_MATCHER             = BlockMatcher.new(
+        /(\s*)?#/,
+        /$/,
+        :format => false,
+        :nest_except => [DOUBLE_QUOTE_STRING_MATCHER, SINGLE_QUOTE_STRING_MATCHER, REGEX_MATCHER, BACK_TICK_MATCHER]
+      ),
       CONTINUING_LINE_MATCHER     = BlockMatcher.new(
-        /(,|\.|\+|-|=\>|&&|\|\||\\|==|\s\?|:)$/,
-        nil,
+        /(,|\.|\+|-|=\>|&&|\|\||\\|==|\s\?|:)(\s*)?(#.*)?$/,
+        /(^|(,|\.|\+|-|=\>|&&|\|\||\\|==|\s\?|:)(\s*)?)(#.*)?$/,
         :indent_end_line => true,
         :negate_ends_match => true,
         :nest_except => [:self, CURLY_BRACKET_MATCHER, ROUND_BRACKET_MATCHER, SQUARE_BRACKET_MATCHER]
@@ -125,7 +131,7 @@ module RBeautify
       def explicit_after_end_match(string)
         after_match = nil
 
-        unless ends == false || string.empty?
+        unless ends == false
 
           if match = ends.match(string)
             unless options[:negate_ends_match]
