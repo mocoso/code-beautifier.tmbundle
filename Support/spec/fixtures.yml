@@ -191,3 +191,41 @@
           c = 5
         end
     end
+
+- name: not treat divison as start of regex
+  pending: implementation of proper identification of the start of regexes
+  input: |
+    def foo
+    a = 1/2
+    b = :foo
+    end
+  output: |
+    def foo
+      a = 1/2
+      b = :foo
+    end
+
+- name: not indent multiline string even if it uses non quote delimiter
+  pending: implementation of block matcher for non quote delimited strings
+  input: |
+    foo = <<TEXT
+          some string
+          and more string
+    TEXT
+    
+- name: recognize when two blocks end on the same line
+  input: |
+    class Foo
+    def foobar
+    if a = 3
+    return 5
+    end; end
+    end
+  output: |
+    class Foo
+      def foobar
+        if a = 3
+          return 5
+      end; end
+    end
+

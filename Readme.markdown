@@ -23,12 +23,10 @@ The 'Beautify all changed' command relies on
         sudo gem sources -a http://gems.github.com/
         sudo gem install mojombo-grit)
 
-## TODO
+## KNOWN ISSUES
 
- - Make multiline string handling work with delimiters other than double quote
- - Add support for blocks with an implicit end e.g. private
- - Parse lines for code blocks that begin and end on the same line
- - Add support for multiple code blocks ending on the same line
+ - Forward slash is treated as the beginning of a regex even when it is not (e.g. in 'a = 1/2')
+ - Does not handle strings defined with delimiters
 
 ## Credits
 
