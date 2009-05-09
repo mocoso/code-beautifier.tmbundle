@@ -1,0 +1,193 @@
+- name: indent if else end statement
+  input: |
+    if foo
+    bar = true
+    else
+    bar = false
+    end
+  output: |
+    if foo
+      bar = true
+    else
+      bar = false
+    end
+
+- name: indent case when statement
+  input: |
+    case foo
+    when 1
+    bar = 'some string'
+    when 2
+    bar = 'some other string'
+    when 3 then bar = '3'
+    else
+    bar = '4'
+    end
+  output: |
+    case foo
+    when 1
+      bar = 'some string'
+    when 2
+      bar = 'some other string'
+    when 3 then bar = '3'
+    else
+      bar = '4'
+    end
+
+- name: ignore code after end of line comment
+  input: |
+    def method_containing_end_of_line_comment
+    a = b # Comment containing do
+    end
+  output: |
+    def method_containing_end_of_line_comment
+      a = b # Comment containing do
+    end
+
+- name :not indent multineline comment:
+  input: |
+    =begin
+    Comment
+    =end
+    foo
+
+- name: indent lines after first of multiline code
+  input: |
+    def method_with_multiline_method_call
+    multiline_method_call \
+    first_arg,
+    second_arg,
+    third_arg
+    end
+  output: |
+    def method_with_multiline_method_call
+      multiline_method_call \
+        first_arg,
+        second_arg,
+        third_arg
+    end
+
+- name: indent method call with bracketed multiline arguments
+  input: |
+    def method_with_multiline_method_call
+    multiline_method_call(first_arg,
+    second_arg,
+    third_arg,
+    fourth_arg
+    )
+    end
+  output: |
+    def method_with_multiline_method_call
+      multiline_method_call(first_arg,
+        second_arg,
+        third_arg,
+        fourth_arg
+      )
+    end
+
+- name: indent method call with bracketed continuing line argument
+  pending: "implementation, currently indents last line, should outdent" 
+  input: |
+    def method_with_multiline_method_call
+    multiline_method_call(foo,
+    bar,
+    foobar)
+    end
+  output: |
+    def method_with_multiline_method_call
+      multiline_method_call(foo,
+        bar,
+        foobar)
+    end
+
+- name: indent method call with multiline arguments (implicit brackets)
+  input: |
+    def method_with_multiline_method_call
+    multiline_method_call first_arg,
+    second_arg,
+    # Comment in the middle of all this
+    third_arg
+    
+    another_method_call
+    end
+  output: |
+    def method_with_multiline_method_call
+      multiline_method_call first_arg,
+        second_arg,
+        # Comment in the middle of all this
+        third_arg
+    
+      another_method_call
+    end
+
+- name: should indent multiline method call chains
+  input: |
+    def method_with_multiline_method_call_chain
+    multiline_method_call.
+    foo.
+    bar
+    
+    another_method_call
+    end
+  output: |
+    def method_with_multiline_method_call_chain
+      multiline_method_call.
+        foo.
+        bar
+    
+      another_method_call
+    end
+
+- name: handle multiline code with escaped quotes in strings
+  input: |
+    def method_containing_multiline_code_with_strings
+    a = "foo #{method}" +
+    "bar"
+    end
+  output: |
+    def method_containing_multiline_code_with_strings
+      a = "foo #{method}" +
+        "bar"
+    end
+
+- name: not change the indentation of multiline strings
+  input: |
+    def method_containing_long_string
+    a = "
+          Some text across multiple lines
+          And another line
+          "
+    b = 5
+    end
+  output: |
+    def method_containing_long_string
+      a = "
+          Some text across multiple lines
+          And another line
+          "
+      b = 5
+    end
+
+- name: end indentation of implicit blocks when another implicit block starts or when surrounding block ends
+  input: |
+    class Foo
+    private
+    def method
+    b = 5
+    end
+    protected
+    def another_method
+    c = 5
+    end
+    end
+  output: |
+    class Foo
+      private
+        def method
+          b = 5
+        end
+      protected
+        def another_method
+          c = 5
+        end
+    end
