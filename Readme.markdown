@@ -25,8 +25,8 @@ The 'Beautify all changed' command relies on
 
 ## KNOWN ISSUES
 
- - Forward slash is treated as the beginning of a regex even when it is not (e.g. in 'a = 1/2')
  - Does not handle strings defined with delimiters
+ - Does not indent bracketed expressions correctly where end bracket is not on it's own line
 
 ## Credits
 

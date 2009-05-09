@@ -18,17 +18,33 @@ module RBeautify
     MATCHERS = [
       PROGRAM_END_MATCHER         = BlockMatcher.new(/^__END__$/, false, :format => false),
       MULTILINE_COMMENT_MATCHER   = BlockMatcher.new(/^=begin/, /^=end/, :format => false),
-      STANDARD_MATCHER            = BlockMatcher.new(/((^(module|class|def|else))|\bdo)\b/, /(^|;\s*)(end|rescue|ensure)\b/),
-      IMPLICIT_END_MATCHER        = BlockMatcher.new(/^(public|protected|private)$/, /^(public|protected|private)(\s*)?(#.*)?$/, :end => :implicit),
+      STANDARD_MATCHER            = BlockMatcher.new(
+        /((^(module|class|def|else))|\bdo)\b/,
+        /(^|;\s*)(end|rescue|ensure)\b/
+      ),
+      IMPLICIT_END_MATCHER        = BlockMatcher.new(/^(public|protected|private)$/,
+        /^(public|protected|private)(\s*)?(#.*)?$/,
+        :end => :implicit
+      ),
       MORE_MATCHERS               = BlockMatcher.new(/(=\s+|^)(until|for|while)\b/, /(^|;\s*)end\b/),
-      BEGIN_MATCHERS              = BlockMatcher.new(/((=\s+|^)begin)|(^(ensure|rescue))\b/, /(^|;\s*)(end|rescue|ensure)\b/),
-      IF_AND_CASE_MATCHER         = BlockMatcher.new(/(((^|;\s*)(if|elsif|case|unless))|(\b(when|then)))\b/, /((^|;\s*)(elsif|else|end)|\b(when|then))\b/),
+      BEGIN_MATCHERS              = BlockMatcher.new(
+        /((=\s+|^)begin)|(^(ensure|rescue))\b/,
+        /(^|;\s*)(end|rescue|ensure)\b/
+      ),
+      IF_AND_CASE_MATCHER         = BlockMatcher.new(
+        /(((^|;\s*)(if|elsif|case|unless))|(\b(when|then)))\b/,
+        /((^|;\s*)(elsif|else|end)|\b(when|then))\b/
+      ),
       CURLY_BRACKET_MATCHER       = BlockMatcher.new(/\{/, /\}/),
       ROUND_BRACKET_MATCHER       = BlockMatcher.new(/\(/, /\)/),
       SQUARE_BRACKET_MATCHER      = BlockMatcher.new(/\[/, /\]/),
       DOUBLE_QUOTE_STRING_MATCHER = BlockMatcher.new(/"/, /"/, :format => false, :escape_character => true),
       SINGLE_QUOTE_STRING_MATCHER = BlockMatcher.new(/'/, /'/, :format => false, :escape_character => true),
-      REGEX_MATCHER               = BlockMatcher.new(/\//, /\//, :format => false, :escape_character => true),
+      REGEX_MATCHER               = BlockMatcher.new(
+        /(^|(.*,\s*))\//, /\//,
+        :format => false,
+        :escape_character => true
+      ),
       BACK_TICK_MATCHER           = BlockMatcher.new(/`/, /`/, :format => false, :escape_character => true),
       COMMENT_MATCHER             = BlockMatcher.new(
         /(\s*)?#/,

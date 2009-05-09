@@ -193,7 +193,6 @@
     end
 
 - name: not treat divison as start of regex
-  pending: implementation of proper identification of the start of regexes
   input: |
     def foo
     a = 1/2

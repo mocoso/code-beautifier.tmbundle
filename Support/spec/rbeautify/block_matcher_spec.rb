@@ -229,6 +229,23 @@ describe RBeautify::BlockMatcher do
 
     end
 
+    describe 'REGEX_MATCHER' do
+
+      before(:each) do
+        @matcher = RBeautify::BlockMatcher::REGEX_MATCHER
+        @current_block = RBeautify::Block.new(@matcher)
+      end
+
+      it { @matcher.after_start_match('/foo/').should == 'foo/' }
+      it { @matcher.after_start_match(', /foo/').should == 'foo/' }
+      it { @matcher.after_start_match('1/2').should be_nil }
+      it { @matcher.after_start_match('anything else').should be_nil }
+
+      it { @matcher.after_end_match('foo/', [@current_block]).should == '' }
+      it { @matcher.after_end_match('', [@current_block]).should be_nil }
+
+    end
+
   end
 
 end
