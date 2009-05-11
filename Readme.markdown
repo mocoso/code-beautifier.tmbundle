@@ -26,7 +26,6 @@ The 'Beautify all changed' command relies on
 ## KNOWN ISSUES
 
  - Does not handle strings defined with delimiters
- - Does not indent bracketed expressions correctly where end bracket is not on it's own line
 
 ## Credits
 

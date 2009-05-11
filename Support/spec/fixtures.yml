@@ -70,25 +70,6 @@
 - name: indent method call with bracketed multiline arguments
   input: |
     def method_with_multiline_method_call
-    multiline_method_call(first_arg,
-    second_arg,
-    third_arg,
-    fourth_arg
-    )
-    end
-  output: |
-    def method_with_multiline_method_call
-      multiline_method_call(first_arg,
-        second_arg,
-        third_arg,
-        fourth_arg
-      )
-    end
-
-- name: indent method call with bracketed continuing line argument
-  pending: "implementation, currently indents last line, should outdent" 
-  input: |
-    def method_with_multiline_method_call
     multiline_method_call(foo,
     bar,
     foobar)
@@ -96,8 +77,8 @@
   output: |
     def method_with_multiline_method_call
       multiline_method_call(foo,
-        bar,
-        foobar)
+                            bar,
+                            foobar)
     end
 
 - name: indent method call with multiline arguments (implicit brackets)
@@ -226,5 +207,29 @@
         if a = 3
           return 5
       end; end
+    end
+
+- name: indent multiline array definition
+  input: |
+    class Foo
+    @@bar = [1, 2
+    3, 4]
+    end
+  output: |
+    class Foo
+      @@bar = [1, 2
+               3, 4]
+    end
+    
+- name: indent multiline hash definition
+  input: |
+    class Foo
+    @@bar = { :foo => 1, :bar => 2
+    :c => 3, :d => 4 }
+    end
+  output: |
+    class Foo
+      @@bar = { :foo => 1, :bar => 2
+                :c => 3, :d => 4 }
     end
 

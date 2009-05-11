@@ -2,9 +2,8 @@ module RBeautify
 
   class Line
 
-    # tab character and size
-    @@tab_char = " "
-    @@tab_size = 2
+    # indent_character
+    @@indent_character = " "
 
     attr_accessor :content, :original_stack
 
@@ -38,20 +37,24 @@ module RBeautify
         original_stack.last.nil? || original_stack.last.format?
       end
 
-      def tabs
+      def indent_size
         if (original_stack.size > stack.size) && (original_stack.last && original_stack.last.indent_end_line?)
-          original_stack.size
+          self.class.indent_size_for_stack(original_stack)
         else
-          (original_stack & stack).size
+          self.class.indent_size_for_stack(original_stack & stack)
         end
       end
 
       def tab_string
-        @@tab_char * @@tab_size * tabs
+        @@indent_character * indent_size
       end
 
       def stripped
         @stripped = content.strip
+      end
+      
+      def self.indent_size_for_stack(stack)
+        stack.map{ |block| block.indent_size}.inject(0) { |sum, indent_size| sum + indent_size }
       end
 
   end
