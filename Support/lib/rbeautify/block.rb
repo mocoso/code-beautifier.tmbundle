@@ -32,11 +32,8 @@ module RBeautify
       block_matcher.end_is_implicit?
     end
 
-    def ==(other)
-      self.block_matcher == other.block_matcher &&
-        self.after_start_match == other.after_start_match &&
-        self.start_offset == other.start_offset &&
-        self.end_offset == other.end_offset
+    def name
+      block_matcher.name
     end
   end
 

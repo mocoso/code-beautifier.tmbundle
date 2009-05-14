@@ -2,7 +2,7 @@
 
 =begin
 /***************************************************************************
- *   Copyright (C) 2008, Paul Lutus, Joel Chippindale                      *
+ *   Copyright (C) 2008, Joel Chippindale, Paul Lutus                      *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -22,24 +22,25 @@
 
 require File.dirname(__FILE__) + '/rbeautify/block.rb'
 require File.dirname(__FILE__) + '/rbeautify/block_matcher.rb'
+require File.dirname(__FILE__) + '/rbeautify/language.rb'
+require File.dirname(__FILE__) + '/rbeautify/config/ruby.rb'
 require File.dirname(__FILE__) + '/rbeautify/line.rb'
 
 module RBeautify
 
-  def RBeautify.beautify_string(source)
+  def RBeautify.beautify_string(language, source)
     dest = ""
     stack = []
 
+    unless language.is_a? RBeautify::Language
+      language = RBeautify::Language.language(language)
+    end
+
     source.split("\n").each do |line_content|
-      line = RBeautify::Line.new(line_content, stack)
+      line = RBeautify::Line.new(language, line_content, stack)
       dest += line.format + "\n"
       stack = line.stack
     end
-
-    # TODO: Decide how to inform users of indentation error
-    # if(!stack.empty?)
-    #   raise "#{path}: Indentation error"
-    # end
 
     return dest
   end

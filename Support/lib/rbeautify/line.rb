@@ -5,9 +5,10 @@ module RBeautify
     # indent_character
     @@indent_character = " "
 
-    attr_accessor :content, :original_stack
+    attr_accessor :content, :original_stack, :language
 
-    def initialize(content, original_stack = [])
+    def initialize(language, content, original_stack = [])
+      self.language = language
       self.content = content
       self.original_stack = original_stack
     end
@@ -29,7 +30,7 @@ module RBeautify
     end
 
     def stack
-      @stack ||= BlockMatcher.calculate_stack(stripped, original_stack)
+      @stack ||= BlockMatcher.calculate_stack(language, stripped, original_stack)
     end
 
     private

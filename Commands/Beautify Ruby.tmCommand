@@ -15,7 +15,7 @@ begin
   require File.join(ENV['TM_BUNDLE_SUPPORT'], 'lib', 'rbeautify')
 
   source = STDIN.read
-  dest = RBeautify.beautify_string(source)
+  dest = RBeautify.beautify_string(:ruby, source)
   unless dest == source
     STDOUT.write(dest)
   end
