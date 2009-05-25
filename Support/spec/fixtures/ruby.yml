@@ -25,13 +25,13 @@
     end
   output: |
     case foo
-    when 1
-      bar = 'some string'
-    when 2
-      bar = 'some other string'
-    when 3 then bar = '3'
-    else
-      bar = '4'
+      when 1
+        bar = 'some string'
+      when 2
+        bar = 'some other string'
+      when 3 then bar = '3'
+      else
+        bar = '4'
     end
 
 - name: ignore code after end of line comment
@@ -79,6 +79,18 @@
       multiline_method_call(foo,
                             bar,
                             foobar)
+    end
+
+- name: indent method call with bracketed multiline arguments_even_if_not_first_block_on_line
+  input: |
+    if (foo = bar(first_arg,
+    second_arg))
+    do_something
+    end
+  output: |
+    if (foo = bar(first_arg,
+                  second_arg))
+      do_something
     end
 
 - name: indent method call with multiline arguments (implicit brackets)
@@ -192,7 +204,7 @@
           some string
           and more string
     TEXT
-    
+
 - name: recognize when two blocks end on the same line
   input: |
     class Foo
@@ -212,15 +224,35 @@
 - name: indent multiline array definition
   input: |
     class Foo
-    @@bar = [1, 2
+    @@bar = [1, 2,
     3, 4]
     end
   output: |
     class Foo
-      @@bar = [1, 2
+      @@bar = [1, 2,
                3, 4]
     end
-    
+
+- name: indent multiline array definition (all on separate lines)
+  input: |
+    class Foo
+    @@bar = [
+    1,
+    2,
+    3,
+    4
+    ]
+    end
+  output: |
+    class Foo
+      @@bar = [
+        1,
+        2,
+        3,
+        4
+      ]
+    end
+
 - name: indent multiline hash definition
   input: |
     class Foo

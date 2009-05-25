@@ -2,53 +2,67 @@ require File.dirname(__FILE__) + '/../spec_helper.rb'
 
 describe RBeautify::BlockMatcher do
 
-  describe '.calculate_stack' do
-    before(:each) do
-      @ruby = RBeautify::Language.language(:ruby)
-    end
+  describe 'class' do
+    describe '#parse' do
+      before(:each) do
+        @ruby = RBeautify::Language.language(:ruby)
+      end
 
-    it 'should not match de' do
-      RBeautify::BlockMatcher.calculate_stack(@ruby, 'de foo').should be_empty
-    end
+      it 'should not match de' do
+        RBeautify::BlockMatcher.parse(@ruby, nil, 0, 'de foo', 0).should be_nil
+      end
 
-    it 'should match def' do
-      RBeautify::BlockMatcher.calculate_stack(@ruby, 'def foo').size.should == 1
-    end
+      it 'should match def' do
+        block = RBeautify::BlockMatcher.parse(@ruby, nil, 0, 'def foo', 0)
+        block.should_not be_nil
+        block.name.should == :standard
+      end
 
-    it 'should match nested blocks' do
-      RBeautify::BlockMatcher.calculate_stack(@ruby, 'if {').size.should == 2
-    end
+      it 'should be nested block' do
+        block = RBeautify::BlockMatcher.parse(@ruby, nil, 0, 'if {', 0)
+        block.should_not be_nil
+        block.name.should == :curly_bracket
+        block.parent.should_not be_nil
+        block.parent.name.should == :if
+      end
 
-    it 'should match nested blocks (taking into account ends)' do
-      RBeautify::BlockMatcher.calculate_stack(@ruby, 'if {}').size.should == 1
-    end
+      it 'should be nested block (taking into account ends)' do
+        block = RBeautify::BlockMatcher.parse(@ruby, nil, 0, 'if {}', 0)
+        block.should_not be_nil
+        block.name.should == :if
+      end
 
-    it 'should match nested blocks (taking into account ends)' do
-      RBeautify::BlockMatcher.calculate_stack(@ruby, 'def foo(bar = {})').size.should == 1
-      RBeautify::BlockMatcher.calculate_stack(@ruby, 'def foo(bar = {})').first.block_matcher.should ==
-        @ruby.matcher(:standard)
-    end
+      it 'should be deeply nested block (taking into account ends)' do
+        block = RBeautify::BlockMatcher.parse(@ruby, nil, 0, 'def foo(bar = {})', 0)
+        block.should_not be_nil
+        block.name.should == :standard
+        block.parent.should be_nil
+      end
 
-    it 'should not change if no started or ended blocks' do
-      current_stack = [RBeautify::Block.new(@ruby.matcher(:standard), 0, 'def', ' foo')]
-      RBeautify::BlockMatcher.calculate_stack(@ruby, 'a = 3', current_stack).should == current_stack
-    end
+      it 'should current block if no started or ended blocks' do
+        block = RBeautify::BlockStart.new(@ruby.matcher(:standard), nil, 0, 0, 'def', ' foo')
+        RBeautify::BlockMatcher.parse(@ruby, block, 0, 'a = 3', 0).should == block
+      end
 
-    it 'should remove block if top of stack ends' do
-      surrounding_block = RBeautify::Block.new(@ruby.matcher(:standard), 0, 'class', ' Foo')
-      current_stack = [
-        surrounding_block,
-        RBeautify::Block.new(@ruby.matcher(:standard), 0, 'def', ' foo')
-      ]
-      RBeautify::BlockMatcher.calculate_stack(@ruby, 'end', current_stack, 0).should == [surrounding_block]
-    end
+      it 'should be newly started block if ends and starts' do
+        current_block = RBeautify::BlockStart.new(@ruby.matcher(:if), nil, 0, 0, 'if', ' foo')
+        block = RBeautify::BlockMatcher.parse(@ruby, current_block, 0, 'else', 0)
+        block.should_not be_nil
+        block.name.should == :if
+        block.parent.should be_nil
+      end
 
-    it 'should remove two blocks if top of stack ends implicitly' do
-      current_stack = [
-        RBeautify::Block.new(@ruby.matcher(:standard), 0, 'class', ' Foo'),
-        RBeautify::Block.new(@ruby.matcher(:implicit_end), 0, 'private', '')
-      ]
-      RBeautify::BlockMatcher.calculate_stack(@ruby, 'end', current_stack, 0).should == []
+      it 'should be parent block if current block ends' do
+        parent_block = RBeautify::BlockStart.new(@ruby.matcher(:standard), nil, 0, 0, 'class', ' Foo')
+        child_block = RBeautify::BlockStart.new(@ruby.matcher(:standard), parent_block, 0, 0, 'def', ' foo')
+        RBeautify::BlockMatcher.parse(@ruby, child_block, 0, 'end', 0).should == parent_block
+      end
+
+      it 'should remove two blocks if top of stack ends implicitly' do
+        parent_block = RBeautify::BlockStart.new(@ruby.matcher(:standard), nil, 0, 0, 'class', ' Foo')
+        child_block = RBeautify::BlockStart.new(@ruby.matcher(:implicit_end), parent_block, 0, 0, 'private', '')
+        RBeautify::BlockMatcher.parse(@ruby, child_block, 0, 'end', 0).should be_nil
+      end
     end
   end
 
@@ -59,17 +73,17 @@ describe RBeautify::BlockMatcher do
 
     it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/).should be_can_nest(nil) }
 
-    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/).should be_can_nest(mock('block', :format? => true)) }
+    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/).should be_can_nest(mock('block_start', :format? => true)) }
 
-    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/).should_not be_can_nest(mock('block', :format? => false)) }
+    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/).should_not be_can_nest(mock('block_start', :format? => false)) }
 
     it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:bar]).should be_can_nest(nil) }
 
-    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:foo]).should be_can_nest(mock('block', :name => :bar, :format? => true)) }
+    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:foo]).should be_can_nest(mock('block_start', :name => :bar, :format? => true)) }
 
-    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:foo]).should_not be_can_nest(mock('block', :name => :bar, :format? => false)) }
+    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:foo]).should_not be_can_nest(mock('block_start', :name => :bar, :format? => false)) }
 
-    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:bar]).should_not be_can_nest(mock('block', :name => :bar, :format? => true)) }
+    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:bar]).should_not be_can_nest(mock('block_start', :name => :bar, :format? => true)) }
   end
 
 end

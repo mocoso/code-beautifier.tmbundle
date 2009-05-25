@@ -20,26 +20,29 @@
  ***************************************************************************/
 =end
 
-require File.dirname(__FILE__) + '/rbeautify/block.rb'
+require File.dirname(__FILE__) + '/rbeautify/block_start.rb'
+require File.dirname(__FILE__) + '/rbeautify/block_end.rb'
 require File.dirname(__FILE__) + '/rbeautify/block_matcher.rb'
 require File.dirname(__FILE__) + '/rbeautify/language.rb'
-require File.dirname(__FILE__) + '/rbeautify/config/ruby.rb'
 require File.dirname(__FILE__) + '/rbeautify/line.rb'
+
+require File.dirname(__FILE__) + '/rbeautify/config/ruby.rb'
+
 
 module RBeautify
 
   def RBeautify.beautify_string(language, source)
     dest = ""
-    stack = []
+    block = nil
 
     unless language.is_a? RBeautify::Language
       language = RBeautify::Language.language(language)
     end
 
-    source.split("\n").each do |line_content|
-      line = RBeautify::Line.new(language, line_content, stack)
+    source.split("\n").each_with_index do |line_content, line_number|
+      line = RBeautify::Line.new(language, line_content, line_number, block)
       dest += line.format + "\n"
-      stack = line.stack
+      block = line.block
     end
 
     return dest

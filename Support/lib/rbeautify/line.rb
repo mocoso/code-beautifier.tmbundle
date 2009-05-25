@@ -5,12 +5,13 @@ module RBeautify
     # indent_character
     @@indent_character = " "
 
-    attr_accessor :content, :original_stack, :language
+    attr_reader :language, :content, :line_number, :original_block, :block
 
-    def initialize(language, content, original_stack = [])
-      self.language = language
-      self.content = content
-      self.original_stack = original_stack
+    def initialize(language, content, line_number, original_block = nil)
+      @language = language
+      @content = content
+      @original_block = original_block
+      @block = BlockMatcher.parse(language, original_block, line_number, stripped, 0)
     end
 
     def format
@@ -29,20 +30,17 @@ module RBeautify
       @formatted
     end
 
-    def stack
-      @stack ||= BlockMatcher.calculate_stack(language, stripped, original_stack)
-    end
-
     private
       def format?
-        original_stack.last.nil? || original_stack.last.format?
+        original_block.nil? || original_block.format?
       end
 
       def indent_size
-        if (original_stack.size > stack.size) && (original_stack.last && original_stack.last.indent_end_line?)
-          self.class.indent_size_for_stack(original_stack)
+        if (block.nil? || block.strict_ancestor_of?(original_block)) && (original_block && original_block.indent_end_line?)
+          original_block.total_indent_size
         else
-          self.class.indent_size_for_stack(original_stack & stack)
+          common_ancestor = BlockStart.first_common_ancestor(original_block, block)
+          common_ancestor.nil? ? 0 : common_ancestor.total_indent_size
         end
       end
 
@@ -52,10 +50,6 @@ module RBeautify
 
       def stripped
         @stripped = content.strip
-      end
-      
-      def self.indent_size_for_stack(stack)
-        stack.map{ |block| block.indent_size}.inject(0) { |sum, indent_size| sum + indent_size }
       end
 
   end

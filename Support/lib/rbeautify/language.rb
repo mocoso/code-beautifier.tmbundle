@@ -4,7 +4,8 @@ module RBeautify
 
     @@languages = {}
 
-    attr_accessor :matchers, :indent_size
+    attr_reader :matchers
+    attr_accessor :indent_size
 
     class << self
 
@@ -22,7 +23,7 @@ module RBeautify
     end
 
     def initialize
-      self.matchers = []
+      @matchers = []
     end
 
     def add_matcher(name, starts, ends, options = {})

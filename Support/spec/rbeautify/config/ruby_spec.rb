@@ -1,5 +1,8 @@
 require File.dirname(__FILE__) + '/../../spec_helper.rb'
 
+
+require File.dirname(__FILE__) + '/../../spec_helper.rb'
+
 run_fixtures_for_language(:ruby)
 
 describe 'Ruby' do
@@ -12,191 +15,181 @@ describe 'Ruby' do
     describe 'standard' do
       before(:each) do
         @matcher = @ruby.matcher(:standard)
-        @current_block = RBeautify::Block.new(@matcher, 0, '', '')
+        @current_block = RBeautify::BlockStart.new(@matcher, nil, 0, 0, '', '')
       end
 
-      it { @matcher.block('class Foo; end', 0).should be_block_like(:standard, 0, 'class', ' Foo; end') }
-      it { @matcher.block('module Foo', 0).should be_block_like(:standard, 0, 'module', ' Foo') }
-      it { @matcher.block('def foo()', 0).should be_block_like(:standard, 0, 'def', ' foo()') }
-      it { @matcher.block('end Foo', 0).should be_nil }
+      it { @matcher.parse_block_start('class Foo; end', nil, 0, 0).should be_block_start_like(:standard, 0, 'class', ' Foo; end') }
+      it { @matcher.parse_block_start('module Foo', nil, 0, 0).should be_block_start_like(:standard, 0, 'module', ' Foo') }
+      it { @matcher.parse_block_start('def foo()', nil, 0, 0).should be_block_start_like(:standard, 0, 'def', ' foo()') }
+      it { @matcher.parse_block_start('end Foo', nil, 0, 0).should be_nil }
 
-      it { @matcher.end_match('end', [@current_block], 0).should == [0, ''] }
-      it { @matcher.end_match('; end', [@current_block], 0).should == [0, ''] }
-      it { @matcher.end_match('rescue', [@current_block], 0).should == [0, ''] }
-      it { @matcher.end_match('ensure', [@current_block], 0).should == [0, ''] }
-      it { @matcher.end_match('}', [@current_block], 0).should be_nil }
-      it { @matcher.end_match('foo end', [@current_block], 0).should be_nil }
-
+      it { @current_block.parse_block_end('end', 0).should be_block_end_like(@current_block, 0, 'end', '') }
+      it { @current_block.parse_block_end('; end', 0).should be_block_end_like(@current_block, 0, '; end', '') }
+      it { @current_block.parse_block_end('rescue', 0).should be_block_end_like(@current_block, 0, 'rescue', '') }
+      it { @current_block.parse_block_end('ensure', 0).should be_block_end_like(@current_block, 0, 'ensure', '') }
+      it { @current_block.parse_block_end('}', 0).should be_nil }
+      it { @current_block.parse_block_end('foo end', 0).should be_nil }
     end
 
-    describe 'if_and_case' do
+    describe 'if' do
       before(:each) do
-        @matcher = @ruby.matcher(:if_and_case)
-        @current_block = RBeautify::Block.new(@matcher, 0, 'if', ' foo')
+        @matcher = @ruby.matcher(:if)
+        @current_block = RBeautify::BlockStart.new(@matcher, nil, 0, 0, 'if', ' foo')
       end
 
-      it { @matcher.block('if foo', 0).should be_block_like(:if_and_case, 0, 'if', ' foo') }
-      it { @matcher.block('case foo', 0).should be_block_like(:if_and_case, 0, 'case', ' foo') }
-      it { @matcher.block('when foo', 0).should be_block_like(:if_and_case, 0, 'when', ' foo') }
-      it { @matcher.block('then foo = bar', 0).should be_block_like(:if_and_case, 0, 'then', ' foo = bar') }
+      it { @matcher.should be_end_can_also_be_start}
 
-      it { @matcher.end_match('end', [@current_block], 0).should == [0, ''] }
-      it { @matcher.end_match('when', [@current_block], 0).should == [0, ''] }
-      it { @matcher.end_match('then', [@current_block], 0).should == [0, ''] }
-      it { @matcher.end_match('else', [@current_block], 0).should == [0, ''] }
+      it { @matcher.parse_block_start('if foo', nil, 0, 0).should be_block_start_like(:if, 0, 'if', ' foo') }
+      it { @matcher.parse_block_start('then foo = bar', nil, 0, 0).should be_block_start_like(:if, 0, 'then', ' foo = bar') }
 
-      it { @matcher.end_match('a = 3', [@current_block], 0).should be_nil }
-
+      it { @current_block.parse_block_end('end', 0).should be_block_end_like(@current_block, 0, 'end', '') }
+      it { @current_block.parse_block_end('then', 0).should be_block_end_like(@current_block, 0, 'then', '') }
+      it { @current_block.parse_block_end('else', 0).should be_block_end_like(@current_block, 0, 'else', '') }
+      it { @current_block.parse_block_end('a = 3', 0).should be_nil }
     end
 
     describe 'curly_bracket' do
       before(:each) do
         @matcher = @ruby.matcher(:curly_bracket)
-        @current_block = RBeautify::Block.new(@matcher, 0, '{', '')
+        @current_block = RBeautify::BlockStart.new(@matcher, nil, 0, 0, '{', '')
       end
 
-      it { @matcher.block('{', 0).should be_block_like(:curly_bracket, 0, '{', '') }
-      it { @matcher.block('end', 0).should be_nil }
+      it { @matcher.parse_block_start('{', nil, 0, 0).should be_block_start_like(:curly_bracket, 0, '{', '') }
+      it { @matcher.parse_block_start('end', nil, 0, 0).should be_nil }
 
-      it { @matcher.end_match('}', [@current_block], 0).should == [0, ''] }
-      it { @matcher.end_match('end', [@current_block], 0).should be_nil }
+      it { @current_block.parse_block_end('}', 0).should be_block_end_like(@current_block, 0, '}', '') }
+      it { @current_block.parse_block_end('end', 0).should be_nil }
 
     end
 
     describe 'double_quote' do
       before(:each) do
         @matcher = @ruby.matcher(:double_quote)
-        @current_block = RBeautify::Block.new(@matcher, 0, '"', 'foo"')
+        @current_block = RBeautify::BlockStart.new(@matcher, nil, 0, 0, '"', 'foo"')
       end
 
-      it { @matcher.block('a = "foo"', 0).should be_block_like(:double_quote, 4, '"', 'foo"') }
-      it { @matcher.block('a = 2', 0).should be_nil }
+      it { @matcher.parse_block_start('a = "foo"', nil, 0, 0).should be_block_start_like(:double_quote, 4, '"', 'foo"') }
+      it { @matcher.parse_block_start('a = 2', nil, 0, 0).should be_nil }
 
-      it { @matcher.end_match(' bar"', [@current_block], 0).should == [4, ''] }
-      it { @matcher.end_match(' " + bar + "', [@current_block], 0).should == [1, ' + bar + "'] }
-      it { @matcher.end_match('\\\\"', [@current_block], 0).should == [2, ''] }
-      it { @matcher.end_match('\\" still within string"', [@current_block], 0).should == [20, ''] }
-      it { @matcher.end_match('a = 2', [@current_block], 0).should be_nil }
-      it { @matcher.end_match('\\"', [@current_block], 0).should be_nil }
-      it { @matcher.end_match('\\\\\\"', [@current_block], 0).should be_nil }
-
+      it { @current_block.parse_block_end(' bar"', 0).should be_block_end_like(@current_block, 4, '"', '') }
+      it { @current_block.parse_block_end(' " + bar + "', 0).should be_block_end_like(@current_block, 1, '"', ' + bar + "') }
+      it { @current_block.parse_block_end('\\\\"', 0).should be_block_end_like(@current_block, 2, '"', '') }
+      it { @current_block.parse_block_end('\\" more string"', 0).should be_block_end_like(@current_block, 14, '"', '') }
+      it { @current_block.parse_block_end('a = 2', 0).should be_nil }
+      it { @current_block.parse_block_end('\\"', 0).should be_nil }
+      it { @current_block.parse_block_end('\\\\\\"', 0).should be_nil }
     end
 
     describe 'single_quote' do
       before(:each) do
         @matcher = @ruby.matcher(:single_quote)
-        @current_block = RBeautify::Block.new(@matcher, 0, "'", "foo'")
+        @current_block = RBeautify::BlockStart.new(@matcher, nil, 0, 0, "'", "foo'")
       end
 
-      it { @matcher.block("describe '#foo?' do", 0).should be_block_like(:single_quote, 9, "'", "#foo?' do") }
-      it { @matcher.block('a = 2', 0).should be_nil }
+      it { @matcher.should_not be_end_can_also_be_start}
+      it { @matcher.parse_block_start("describe '#foo?' do", nil, 0, 0).should be_block_start_like(:single_quote, 9, "'", "#foo?' do") }
+      it { @matcher.parse_block_start('a = 2', nil, 0, 0).should be_nil }
 
-      it { @matcher.end_match("#foo?' do", [@current_block], 9).should == [14, ' do'] }
-      it { @matcher.end_match('a = 2', [@current_block], 0).should be_nil }
-
+      it { @current_block.parse_block_end("#foo?' do", 9).should be_block_end_like(@current_block, 14, "'", ' do')}
+      it { @current_block.parse_block_end('a = 2', 0).should be_nil }
     end
 
     describe 'continuing_line' do
       before(:each) do
         @matcher = @ruby.matcher(:continuing_line)
-        @current_block = RBeautify::Block.new(@matcher, 8, ',', '')
+        @current_block = RBeautify::BlockStart.new(@matcher, nil, 0, 8, ',', '')
       end
 
-      it { @matcher.block('foo :bar,', 0).should be_block_like(:continuing_line, 8, ',', '') }
-      it { @matcher.block('a = 3 &&', 0).should be_block_like(:continuing_line, 6, '&&', '') }
-      it { @matcher.block('a = 3 ||', 0).should be_block_like(:continuing_line, 6, '||', '') }
-      it { @matcher.block('a = 3 +', 0).should be_block_like(:continuing_line, 6, '+', '') }
-      it { @matcher.block('a = 3 -', 0).should be_block_like(:continuing_line, 6, '-', '') }
-      it { @matcher.block("a \\", 0).should be_block_like(:continuing_line, 2, '\\', '') }
-      it { @matcher.block('a ?', 0).should be_block_like(:continuing_line, 1, ' ?', '')  }
-      it { @matcher.block('a ? # some comment', 0).should be_block_like(:continuing_line, 1, ' ? # some comment', '') }
-      it { @matcher.block('a = 3', 0).should be_nil }
-      it { @matcher.block('a = foo.bar?', 0).should be_nil }
-      it { @matcher.block('# just a comment', 0).should be_nil }
+      it { @matcher.parse_block_start('foo :bar,', nil, 0, 0).should be_block_start_like(:continuing_line, 8, ',', '') }
+      it { @matcher.parse_block_start('a = 3 &&', nil, 0, 0).should be_block_start_like(:continuing_line, 6, '&&', '') }
+      it { @matcher.parse_block_start('a = 3 ||', nil, 0, 0).should be_block_start_like(:continuing_line, 6, '||', '') }
+      it { @matcher.parse_block_start('a = 3 +', nil, 0, 0).should be_block_start_like(:continuing_line, 6, '+', '') }
+      it { @matcher.parse_block_start('a = 3 -', nil, 0, 0).should be_block_start_like(:continuing_line, 6, '-', '') }
+      it { @matcher.parse_block_start("a \\", nil, 0, 0).should be_block_start_like(:continuing_line, 2, '\\', '') }
+      it { @matcher.parse_block_start('a ?', nil, 0, 0).should be_block_start_like(:continuing_line, 1, ' ?', '')  }
+      it { @matcher.parse_block_start('a ? # some comment', nil, 0, 0).should be_block_start_like(:continuing_line, 1, ' ? # some comment', '') }
+      it { @matcher.parse_block_start('a = 3', nil, 0, 0).should be_nil }
+      it { @matcher.parse_block_start('a = foo.bar?', nil, 0, 0).should be_nil }
+      it { @matcher.parse_block_start('# just a comment', nil, 0, 0).should be_nil }
 
-      it { @matcher.end_match('a = 3', [@current_block], 0).should == [0, 'a = 3'] }
-      it { @matcher.end_match('foo :bar,', [@current_block], 0).should be_nil }
-      it { @matcher.end_match('a = 3 &&', [@current_block], 0).should be_nil }
-      it { @matcher.end_match('a = 3 +', [@current_block], 0).should be_nil }
-      it { @matcher.end_match("a \\", [@current_block], 0).should be_nil }
-      it { @matcher.end_match('# just a comment', [@current_block], 0).should be_nil }
-      it { @matcher.end_match('#', [@current_block], 0).should be_nil }
-
+      it { @current_block.parse_block_end('a = 3', 0).should be_block_end_like(@current_block, 0, '', 'a = 3') }
+      it { @current_block.parse_block_end('foo :bar,', 0).should be_nil }
+      it { @current_block.parse_block_end('a = 3 &&', 0).should be_nil }
+      it { @current_block.parse_block_end('a = 3 +', 0).should be_nil }
+      it { @current_block.parse_block_end("a \\", 0).should be_nil }
+      it { @current_block.parse_block_end('# just a comment', 0).should be_nil }
+      it { @current_block.parse_block_end('#', 0).should be_nil }
     end
 
     describe 'implicit_end' do
       before(:each) do
         @matcher = @ruby.matcher(:implicit_end)
-        @current_block = RBeautify::Block.new(@matcher, 0, '', '')
+        @current_block = RBeautify::BlockStart.new(@matcher, nil, 0, 0, '', '')
       end
 
-      it { @matcher.block('private', 0).should be_block_like(:implicit_end, 0, 'private', '') }
-      it { @matcher.block('protected', 0).should be_block_like(:implicit_end, 0, 'protected', '') }
-      it { @matcher.block('a = 3', 0).should be_nil }
+      it { @matcher.should be_end_can_also_be_start}
 
-      it { @matcher.end_match('protected', [@current_block], 0).should == [0, ''] }
-      it { @matcher.end_match('protected # some comment', [@current_block], 0).should == [0, ''] }
-      it { @matcher.end_match('a = 3', [@current_block], 0).should be_nil }
+      it { @matcher.parse_block_start('private', nil, 0, 0).should be_block_start_like(:implicit_end, 0, 'private', '') }
+      it { @matcher.parse_block_start('protected', nil, 0, 0).should be_block_start_like(:implicit_end, 0, 'protected', '') }
+      it { @matcher.parse_block_start('a = 3', nil, 0, 0).should be_nil }
+
+      it { @current_block.parse_block_end('protected', 0).should be_block_end_like(@current_block, 0, 'protected', '') }
+      it { @current_block.parse_block_end('protected # some comment', 0).should be_block_end_like(@current_block, 0, 'protected # some comment', '') }
+      it { @current_block.parse_block_end('a = 3', 0).should be_nil }
 
       it 'should return both if implicit end from next block in stack' do
-        surrounding_block = RBeautify::Block.new(@ruby.matcher(:standard), 0, 'def', ' foo')
-        @matcher.end_match('end', [surrounding_block, @current_block], 0).should == [0, '']
+        surrounding_block = RBeautify::BlockStart.new(@ruby.matcher(:standard), nil, 0, 0, 'def', ' foo')
+        current_block = RBeautify::BlockStart.new(@matcher, surrounding_block, 0, 0, '', '')
+        current_block.parse_block_end('end', 0).should be_block_end_like(surrounding_block, 0, 'end', '')
       end
 
       it 'should return none if no implicit end from next block in stack' do
-        surrounding_block = RBeautify::Block.new(@ruby.matcher(:standard), 0, 'def', ' foo')
-        @matcher.end_match('a = 3', [surrounding_block, @current_block], 0).should be_nil
+        surrounding_block = RBeautify::BlockStart.new(@ruby.matcher(:standard), nil, 0, 0, 'def', ' foo')
+        @current_block.parse_block_end('a = 3', 0).should be_nil
       end
-
     end
 
     describe 'round_bracket' do
       before(:each) do
         @matcher = @ruby.matcher(:round_bracket)
-        @current_block = RBeautify::Block.new(@matcher, 0, '(', '')
+        @current_block = RBeautify::BlockStart.new(@matcher, nil, 0, 0, '(', '')
       end
 
-      it { @matcher.block('a = (foo,', 0).should be_block_like(:round_bracket, 4, '(', 'foo,') }
-      it { @matcher.block('anything else', 0).should be_nil }
+      it { @matcher.parse_block_start('a = (foo,', nil, 0, 0).should be_block_start_like(:round_bracket, 4, '(', 'foo,') }
+      it { @matcher.parse_block_start('anything else', nil, 0, 0).should be_nil }
 
-      it { @matcher.end_match('foo)', [@current_block], 0).should == [3, ''] }
-      it { @matcher.end_match('a = 3', [@current_block], 0).should be_nil }
-
+      it { @current_block.parse_block_end('foo)', 0).should be_block_end_like(@current_block, 3, ')', '') }
+      it { @current_block.parse_block_end('a = 3', 0).should be_nil }
     end
 
     describe 'comment' do
-
       before(:each) do
         @matcher = @ruby.matcher(:comment)
-        @current_block = RBeautify::Block.new(@matcher, 8, '#', ' comment')
+        @current_block = RBeautify::BlockStart.new(@matcher, nil, 0, 8, '#', ' comment')
       end
 
-      it { @matcher.block('anything # comment', 0).should be_block_like(:comment, 8, ' #', ' comment') }
-      it { @matcher.block('#', 0).should be_block_like(:comment, 0, '#', '') }
-      it { @matcher.block('anything else', 0).should be_nil }
+      it { @matcher.parse_block_start('anything # comment', nil, 0, 0).should be_block_start_like(:comment, 8, ' #', ' comment') }
+      it { @matcher.parse_block_start('#', nil, 0, 0).should be_block_start_like(:comment, 0, '#', '') }
+      it { @matcher.parse_block_start('anything else', nil, 0, 0).should be_nil }
 
-      it { @matcher.end_match('anything', [@current_block], 0).should == [8, ''] }
-      it { @matcher.end_match('', [@current_block], 0).should == [0, ''] }
-
+      it { @current_block.parse_block_end('anything', 0).should be_block_end_like(@current_block, 8, '', '') }
+      it { @current_block.parse_block_end('', 0).should be_block_end_like(@current_block, 0, '', '') }
     end
 
     describe 'regex' do
-
       before(:each) do
         @matcher = @ruby.matcher(:regex)
-        @current_block = RBeautify::Block.new(@matcher, 0, '/', 'foo/')
+        @current_block = RBeautify::BlockStart.new(@matcher, nil, 0, 0, '/', 'foo/')
       end
 
-      it { @matcher.block('/foo/', 0).should be_block_like(:regex, 0, '/', 'foo/') }
-      it { @matcher.block(', /foo/', 0).should be_block_like(:regex, 0, ', /', 'foo/') }
-      it { @matcher.block('1/2', 0).should be_nil }
-      it { @matcher.block('anything else', 0).should be_nil }
+      it { @matcher.parse_block_start('/foo/', nil, 0, 0).should be_block_start_like(:regex, 0, '/', 'foo/') }
+      it { @matcher.parse_block_start(', /foo/', nil, 0, 0).should be_block_start_like(:regex, 0, ', /', 'foo/') }
+      it { @matcher.parse_block_start('1/2', nil, 0, 0).should be_nil }
+      it { @matcher.parse_block_start('anything else', nil, 0, 0).should be_nil }
 
-      it { @matcher.end_match('foo/', [@current_block], 0).should == [3, ''] }
-      it { @matcher.end_match('', [@current_block], 0).should be_nil }
+      it { @current_block.parse_block_end('foo/', 0).should be_block_end_like(@current_block, 3, '/', '') }
+      it { @current_block.parse_block_end('', 0).should be_nil }
 
     end
-
   end
-
 end
