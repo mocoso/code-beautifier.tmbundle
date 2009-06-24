@@ -6,10 +6,15 @@ Code Beautifier only supports Ruby at present but does improve upon Textmate's i
 
 ## Installation
 
-Run this:
+If you have git installed your machine then run this:
 
     cd ~/Library/Application\ Support/TextMate/Bundles
     git clone git://github.com/mocoso/code-beautifier.tmbundle.git Code\ Beautifier.tmbundle
+
+Otherwise download the [zip][] or [tarball][] and unpack it in ~/Library/Application\ Support/TextMate/Bundles.
+
+  [zip]:http://github.com/mocoso/code-beautifier.tmbundle/zipball/master
+  [tarball]:http://github.com/mocoso/code-beautifier.tmbundle/tarball/master
 
 Then select 'Bundles > Bundle Editor > Reload Bundles' from Textmate's menus
 
