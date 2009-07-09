@@ -12,6 +12,16 @@
       bar = false
     end
 
+- name: handle case where if begins and ends on same line
+  input: |
+    foo do
+    if a then b = 1 else b = 2 end
+    end
+  output: |
+    foo do
+      if a then b = 1 else b = 2 end
+    end
+
 - name: indent case when statement
   input: |
     case foo

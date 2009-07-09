@@ -28,8 +28,8 @@ unless RBeautify::Language.language(:ruby)
                    /(^|;\s*)(end|rescue|ensure)\b/)
 
   ruby.add_matcher(:if,
-                   /(((^|;\s*)(if|elsif|else|unless))|\bthen)\b/,
-                   /((^|;\s*)(elsif|else|end)|\bthen)\b/,
+                   /(((^|;\s*)(if|unless))|\b(then|elsif|else))\b/,
+                   /\b(then|elsif|else|end)\b/,
                    :nest_except => [:case])
 
   ruby.add_matcher(:case,
