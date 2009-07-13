@@ -288,3 +288,17 @@
     foo = bar.collect { |paragraph|
       paragraph.strip
     }.join("\n")
+
+- name: indent continuing lines ending in = and +
+  input: |
+    def foo
+    @bar ||=
+    1 +
+    2
+    end
+  output: |
+    def foo
+      @bar ||=
+        1 +
+        2
+    end

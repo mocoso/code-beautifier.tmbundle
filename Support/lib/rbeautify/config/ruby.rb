@@ -102,8 +102,8 @@ unless RBeautify::Language.language(:ruby)
     :nest_except => [:double_quote, :single_quote, :regex, :back_tick])
 
   ruby.add_matcher(:continuing_line,
-                   /(,|\.|\+|-|=\>|&&|\|\||\\|==|\s\?|:)(\s*)?(#.*)?$/,
-                   /(^|(,|\.|\+|-|=\>|&&|\|\||\\|==|\s\?|:)(\s*)?)(#.*)?$/,
+                   /(,|\.|\+|-|=\>|=|&&|\|\||\\|==|\s\?|:)(\s*)?(#.*)?$/,
+                   /(^|(,|\.|\+|-|=\>|=|&&|\|\||\\|==|\s\?|:)(\s*)?)(#.*)?$/,
                    :indent_end_line => true,
                    :negate_ends_match => true,
                    :nest_except => [:continuing_line, :curly_bracket, :round_bracket, :square_bracket])
