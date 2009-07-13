@@ -319,3 +319,28 @@
         1 +
         2
     end
+
+- name: indent block within implicit brackets
+  pending: Implementation of support for this feature
+  input: |
+    def foo
+    bar first_arg,
+    second_arg
+    [
+    1,
+    2,
+    3
+    ],
+    last_arg
+    end
+  output: |
+    def foo
+      bar first_arg,
+        second_arg
+        [
+          1,
+          2,
+          3
+        ],
+        last_arg
+    end
