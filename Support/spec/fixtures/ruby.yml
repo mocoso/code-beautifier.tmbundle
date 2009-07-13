@@ -279,3 +279,12 @@
                 :c => 3, :d => 4 }
     end
 
+- name: indent multiline block delimited with curly brackets
+  input: |
+    foo = bar.collect { |paragraph|
+    paragraph.strip
+    }.join("\n")
+  output: |
+    foo = bar.collect { |paragraph|
+      paragraph.strip
+    }.join("\n")

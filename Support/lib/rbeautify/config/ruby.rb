@@ -43,9 +43,11 @@ unless RBeautify::Language.language(:ruby)
                    :end => :implicit,
                    :end_can_also_be_start => true)
 
-  bracket_indent_end_line_proc = Proc.new { |block| !block.after_match.empty?}
+  # TODO: Improve the check that this is not a block with arguments. Will
+  # currently match any bracket followed by spaces and |.
+  bracket_indent_end_line_proc = Proc.new { |block| !block.after_match.empty? && !block.after_match.match(/^\|/) }
   bracket_indent_size_proc = Proc.new do |block|
-    unless block.after_match.empty?
+    if bracket_indent_end_line_proc.call(block)
       strict_ancestors_on_same_line = block.ancestors.select { |a| a != block && a.line_number == block.line_number }
       block.end_offset - strict_ancestors_on_same_line.inject(0) { |sum, a| sum + a.indent_size }
     end
