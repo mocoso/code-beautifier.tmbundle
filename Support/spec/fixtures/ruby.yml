@@ -1,15 +1,19 @@
 - name: indent if else end statement
   input: |
     if foo
-    bar = true
+    bar = 1
+    elsif foo2
+    bar = 2
     else
-    bar = false
+    bar = 3
     end
   output: |
     if foo
-      bar = true
+      bar = 1
+    elsif foo2
+      bar = 2
     else
-      bar = false
+      bar = 3
     end
 
 - name: handle case where if begins and ends on same line
