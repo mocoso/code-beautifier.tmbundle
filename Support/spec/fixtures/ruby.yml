@@ -325,7 +325,7 @@
   input: |
     def foo
     bar first_arg,
-    second_arg
+    second_arg,
     [
     1,
     2,
@@ -336,7 +336,7 @@
   output: |
     def foo
       bar first_arg,
-        second_arg
+        second_arg,
         [
           1,
           2,
