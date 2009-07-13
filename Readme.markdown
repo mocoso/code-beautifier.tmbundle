@@ -32,6 +32,7 @@ The 'Beautify all changed' command relies on
 
  - Does not handle strings defined with delimiters
  - Does not handle multiline blocks within implied brackets
+ - Does not indent continuing line statements within brackets correctly
 
 ## Credits
 

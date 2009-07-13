@@ -289,6 +289,23 @@
       paragraph.strip
     }.join("\n")
 
+- name: indent method call with bracketed multiline arguments including continuing statements
+  pending: Implementation of support for continuing statements in bracketed multline arguments
+  input: |
+    def foo
+    bar(first_arg,
+    second_part_a +
+    second_part_b,
+    third_arg)
+    end
+  output: |
+    def foo
+      bar(first_arg,
+          second_part_a +
+            second_part_b,
+          third_arg)
+    end
+
 - name: indent continuing lines ending in = and +
   input: |
     def foo
