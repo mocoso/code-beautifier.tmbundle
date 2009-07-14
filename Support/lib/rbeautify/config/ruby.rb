@@ -84,7 +84,7 @@ unless RBeautify::Language.language(:ruby)
                    :escape_character => true)
 
   ruby.add_matcher(:regex,
-                   /(^|(.*,\s*))\//,
+                   /(^|((,|=|~)\s*))\//, # Try to distinguish it from division sign
                    /\//,
                    :format => false,
                    :escape_character => true,

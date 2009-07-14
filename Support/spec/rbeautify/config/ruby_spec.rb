@@ -184,9 +184,12 @@ describe 'Ruby' do
 
       it { @matcher.parse_block_start('/foo/', nil, 0, 0).should be_block_start_like(:regex, 0, '/', 'foo/') }
       it { @matcher.parse_block_start(', /foo/', nil, 0, 0).should be_block_start_like(:regex, 0, ', /', 'foo/') }
+      it { @matcher.parse_block_start('foo = /bar/', nil, 0, 0).should be_block_start_like(:regex, 4, '= /', 'bar/') }
+      it { @matcher.parse_block_start('foo =~ /bar/', nil, 0, 0).should be_block_start_like(:regex, 5, '~ /', 'bar/') }
       it { @matcher.parse_block_start('1/2', nil, 0, 0).should be_nil }
       it { @matcher.parse_block_start('anything else', nil, 0, 0).should be_nil }
 
+      it { @current_block.parse_block_end('foo/', 0).should be_block_end_like(@current_block, 3, '/', '') }
       it { @current_block.parse_block_end('foo/', 0).should be_block_end_like(@current_block, 3, '/', '') }
       it { @current_block.parse_block_end('', 0).should be_nil }
 
