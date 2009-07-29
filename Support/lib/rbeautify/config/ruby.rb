@@ -4,6 +4,8 @@ unless RBeautify::Language.language(:ruby)
 
   ruby = RBeautify::Language.add_language(:ruby)
 
+  pre_keyword_boundary = '(^|[^a-z0-9A-Z:.])' # like \b but with : and . added
+
   ruby.indent_size = 2
 
   ruby.add_matcher(:program_end, /^__END__$/, false, :format => false)
@@ -11,7 +13,7 @@ unless RBeautify::Language.language(:ruby)
   ruby.add_matcher(:multiline_comment, /^=begin/, /^=end/, :format => false)
 
   ruby.add_matcher(:standard,
-                   /((^(module|class|def))|\bdo)\b/,
+                   /((^(module|class|def))|#{pre_keyword_boundary}do)\b/,
                    /(^|;\s*)(end|rescue|ensure)\b/)
 
   ruby.add_matcher(:implicit_end,
@@ -28,17 +30,17 @@ unless RBeautify::Language.language(:ruby)
                    /(^|;\s*)(end|rescue|ensure)\b/)
 
   ruby.add_matcher(:if,
-                   /(((^|;\s*)(if|unless))|\b(then|elsif|else))\b/,
-                   /\b(then|elsif|else|end)\b/,
+                   /(((^|;\s*)(if|unless))|#{pre_keyword_boundary}(then|elsif|else))\b/,
+                   /#{pre_keyword_boundary}(then|elsif|else|end)\b/,
                    :nest_except => [:case])
 
   ruby.add_matcher(:case,
-                   /\bcase\b/,
+                   /#{pre_keyword_boundary}case\b/,
                    /(^|;\s*)end\b/)
 
   ruby.add_matcher(:inner_case,
-                   /((^|;\s*)(when|else)|\bthen)\b/,
-                   /((^|;\s*)(when|else)|\bthen)\b/,
+                   /((^|;\s*)(when|else)|#{pre_keyword_boundary}then)\b/,
+                   /((^|;\s*)(when|else)|#{pre_keyword_boundary}then)\b/,
                    :nest_only => [:case],
                    :end => :implicit,
                    :end_can_also_be_start => true)

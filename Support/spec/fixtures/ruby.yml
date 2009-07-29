@@ -344,3 +344,19 @@
         ],
         last_arg
     end
+
+- name: should not treat :do as do
+  input: |
+    case params[:do]
+    when "update_details"
+    update_project
+    when "update_options"
+    update_options
+    end
+  output: |
+    case params[:do]
+      when "update_details"
+        update_project
+      when "update_options"
+        update_options
+    end
