@@ -48,6 +48,24 @@
         bar = '4'
     end
 
+- name: indent while statement
+  input: |
+    def foo
+    bar = 1
+    while bar < 3
+    puts bar
+    bar = bar.next
+    end
+    end
+  output: |
+    def foo
+      bar = 1
+      while bar < 3
+        puts bar
+        bar = bar.next
+      end
+    end
+
 - name: ignore code after end of line comment
   input: |
     def method_containing_end_of_line_comment
