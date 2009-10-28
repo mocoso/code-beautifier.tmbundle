@@ -32,7 +32,7 @@ module RBeautify
 
     private
       def format?
-        original_block.nil? || original_block.format?
+        original_block.nil? || original_block.format_content?
       end
 
       def indent_size

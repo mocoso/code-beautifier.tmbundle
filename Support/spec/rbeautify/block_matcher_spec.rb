@@ -73,17 +73,17 @@ describe RBeautify::BlockMatcher do
 
     it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/).should be_can_nest(nil) }
 
-    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/).should be_can_nest(mock('block_start', :format? => true)) }
+    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/).should be_can_nest(mock('block_start', :parse_content? => true)) }
 
-    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/).should_not be_can_nest(mock('block_start', :format? => false)) }
+    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/).should_not be_can_nest(mock('block_start', :parse_content? => false)) }
 
     it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:bar]).should be_can_nest(nil) }
 
-    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:foo]).should be_can_nest(mock('block_start', :name => :bar, :format? => true)) }
+    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:foo]).should be_can_nest(mock('block_start', :name => :bar, :parse_content? => true)) }
 
-    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:foo]).should_not be_can_nest(mock('block_start', :name => :bar, :format? => false)) }
+    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:foo]).should_not be_can_nest(mock('block_start', :name => :bar, :parse_content? => false)) }
 
-    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:bar]).should_not be_can_nest(mock('block_start', :name => :bar, :format? => true)) }
+    it { RBeautify::BlockMatcher.new(@language, :foo, /foo/, /bar/, :nest_except => [:bar]).should_not be_can_nest(mock('block_start', :name => :bar, :parse_content? => true)) }
   end
 
 end

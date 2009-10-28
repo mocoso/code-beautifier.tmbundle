@@ -89,12 +89,18 @@ module RBeautify
       evaluate_option_for_block(:indent_size, block) || language.indent_size
     end
 
-    def format?
-      options[:format] != false
+    # Look for blocks within the content of this one
+    def parse_content?
+      options[:parse_content] != false
+    end
+
+    # Indent the content of this block
+    def format_content?
+      options[:format_content] != false
     end
 
     def can_nest?(parent_block)
-      return false unless parent_block.nil? || parent_block.format?
+      return false unless parent_block.nil? || parent_block.parse_content?
 
       if options[:nest_only]
         parent_block && options[:nest_only].include?(parent_block.name)
@@ -134,14 +140,14 @@ module RBeautify
       name
     end
 
-  private
-    def evaluate_option_for_block(key, block)
-      if options[key] && options[key].respond_to?(:call)
-        options[key].call(block)
-      else
-        options[key]
+    private
+      def evaluate_option_for_block(key, block)
+        if options[key] && options[key].respond_to?(:call)
+          options[key].call(block)
+        else
+          options[key]
+        end
       end
-    end
 
   end
 end

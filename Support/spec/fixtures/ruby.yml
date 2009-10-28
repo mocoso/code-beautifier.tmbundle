@@ -379,3 +379,32 @@
         update_do.do
     end
 
+- name: should recognize interpolation and not match other content within double quotes
+  input: |
+    def foo
+     return "Foo#{" (#{bar})"}"
+    end
+  output: |
+    def foo
+      return "Foo#{" (#{bar})"}"
+    end
+
+- name: should not non interpolsted content within regexes and strings and backticks
+  input: |
+    def foo
+    @foo = [
+    /" if bar/,
+    `ls if`,
+    "if fun =",
+    'else'
+    ]
+    end
+  output: |
+    def foo
+      @foo = [
+        /" if bar/,
+        `ls if`,
+        "if fun =",
+        'else'
+      ]
+    end

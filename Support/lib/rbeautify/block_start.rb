@@ -38,8 +38,12 @@ module RBeautify
       block_end
     end
 
-    def format?
-      block_matcher.format?
+    def format_content?
+      block_matcher.format_content?
+    end
+
+    def parse_content?
+      block_matcher.parse_content?
     end
 
     def indent_end_line?
