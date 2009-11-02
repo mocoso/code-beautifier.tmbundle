@@ -103,12 +103,14 @@ def run_fixtures_for_language(language)
       it "should #{fixture['name']}" do
         input = fixture['input']
         output = fixture['output'] || input
+        debug = fixture['debug'] || false
 
         if fixture['pending']
           pending fixture['pending'] do
             RBeautify.beautify_string(language, input).should == output
           end
         else
+          RBeautify::BlockMatcher.debug = debug
           RBeautify.beautify_string(language, input).should == output
         end
       end

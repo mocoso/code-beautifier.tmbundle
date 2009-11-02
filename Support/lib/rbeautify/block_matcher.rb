@@ -33,15 +33,30 @@ module RBeautify
               block_start_candidate.offset == block_end.offset
             block_start = block_start_candidate
           end
+
         end
 
         if block_start
+          if debug
+            puts "MATCH: '#{string.slice(0, string.length - block_start.match.length - block_start.after_match.length)}<START type=#{block_start.name}>#{block_start.match}</START>#{block_start.after_match}'"
+          end
           parse(language, block_start, line_number, block_start.after_match, block_start.end_offset)
         elsif block_end
+          if debug
+            puts "MATCH: '#{string.slice(0, string.length - block_end.match.length - block_end.after_match.length)}<END>#{block_end.match}</END>#{block_end.after_match}'"
+          end
           parse(language, block_end.block_start.parent, line_number, block_end.after_match, block_end.end_offset)
         else
           original_block
         end
+      end
+
+      def debug=(value)
+        @debug = value
+      end
+
+      def debug
+        @debug
       end
 
       private
@@ -119,14 +134,14 @@ module RBeautify
       name
     end
 
-    private
-      def evaluate_option_for_block(key, block)
-        if options[key] && options[key].respond_to?(:call)
-          options[key].call(block)
-        else
-          options[key]
-        end
+  private
+    def evaluate_option_for_block(key, block)
+      if options[key] && options[key].respond_to?(:call)
+        options[key].call(block)
+      else
+        options[key]
       end
+    end
 
   end
 end
