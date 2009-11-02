@@ -363,18 +363,19 @@
         last_arg
     end
 
-- name: should not treat :do as do
+- name: "should not treat ':', '_' or '.' as word boundaries before keywords"
   input: |
     case params[:do]
-    when "update_details"
-    update_project
-    when "update_options"
-    update_options
+    when "update_if"
+    update_if.if
+    when "update_do"
+    update_do.do
     end
   output: |
     case params[:do]
-      when "update_details"
-        update_project
-      when "update_options"
-        update_options
+      when "update_if"
+        update_if.if
+      when "update_do"
+        update_do.do
     end
+

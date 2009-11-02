@@ -4,7 +4,7 @@ unless RBeautify::Language.language(:ruby)
 
   ruby = RBeautify::Language.add_language(:ruby)
 
-  pre_keyword_boundary = '(^|[^a-z0-9A-Z:.])' # like \b but with : and . added
+  pre_keyword_boundary = '(^|[^a-z0-9A-Z:._])' # like \b but with ':', '.' and '_' added to list of exception
 
   ruby.indent_size = 2
 
