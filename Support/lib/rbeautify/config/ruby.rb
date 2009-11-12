@@ -5,7 +5,8 @@ unless RBeautify::Language.language(:ruby)
   ruby = RBeautify::Language.add_language(:ruby)
 
   pre_keyword_boundary = '(^|[^a-z0-9A-Z:._])' # like \b but with : , . _ all added to list of exceptions
-
+  start_statement_boundary = '(^|(;|=)\s*)'
+  continue_statement_boundary = '(^|;\s*)'
   ruby.indent_size = 2
 
   ruby.add_matcher(:program_end, /^__END__$/, false, :format_content => false, :parse_content => false)
@@ -50,8 +51,8 @@ unless RBeautify::Language.language(:ruby)
                    :nest_except => [:double_quote, :single_quote, :regex, :back_tick])
 
   ruby.add_matcher(:standard,
-                   /((^(module|class|def))|#{pre_keyword_boundary}do)\b/,
-                   /(^|;\s*)(end|rescue|ensure)\b/,
+                   /((#{start_statement_boundary}(module|class|def))|#{pre_keyword_boundary}do)\b/,
+                   /(((^|;|\s)end)|#{continue_statement_boundary}(rescue|ensure))\b/,
                    :nest_except => [:double_quote, :regex, :backtick])
 
   ruby.add_matcher(:implicit_end,
@@ -61,28 +62,28 @@ unless RBeautify::Language.language(:ruby)
                    :nest_except => [:double_quote, :regex, :backtick])
 
   ruby.add_matcher(:more,
-                   /(=\s+|^)(until|for|while)\b/,
-                   /(^|;\s*)end\b/,
+                   /#{start_statement_boundary}(until|for|while)\b/,
+                   /(((^|;|\s)end)|#{continue_statement_boundary}(rescue|ensure))\b/,
                    :nest_except => [:double_quote, :regex, :backtick])
 
   ruby.add_matcher(:begin,
-                   /((=\s+|^)begin)|(^(ensure|rescue))\b/,
-                   /(^|;\s*)(end|rescue|ensure)\b/,
+                   /(#{start_statement_boundary}begin)|(#{continue_statement_boundary}(ensure|rescue))\b/,
+                   /(((^|;|\s)end)|#{continue_statement_boundary}(rescue|ensure))\b/,
                    :nest_except => [:double_quote, :regex, :backtick])
 
   ruby.add_matcher(:if,
-                   /(((^|;\s*)(if|unless))|#{pre_keyword_boundary}(then|elsif|else))\b/,
-                   /#{pre_keyword_boundary}(then|elsif|else|end)\b/,
+                   /((#{start_statement_boundary}(if|unless))|#{continue_statement_boundary}(then|elsif|else))\b/,
+                   /(((^|;|\s)end)|(#{continue_statement_boundary}(then|elsif|else)))\b/,
                    :nest_except => [:case, :double_quote, :regex, :backtick])
 
   ruby.add_matcher(:case,
                    /#{pre_keyword_boundary}case\b/,
-                   /(^|;\s*)end\b/,
+                   /(^|;|\s)end\b/,
                    :nest_except => [:double_quote, :regex, :backtick])
 
   ruby.add_matcher(:inner_case,
-                   /((^|;\s*)(when|else)|#{pre_keyword_boundary}then)\b/,
-                   /((^|;\s*)(when|else)|#{pre_keyword_boundary}then)\b/,
+                   /#{continue_statement_boundary}(when|else|then)\b/,
+                   /#{continue_statement_boundary}(when|else|then)\b/,
                    :nest_only => [:case],
                    :end => :implicit,
                    :end_can_also_be_start => true,

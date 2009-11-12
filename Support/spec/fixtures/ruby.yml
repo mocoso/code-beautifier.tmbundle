@@ -408,3 +408,25 @@
         'else'
       ]
     end
+
+- name: should handle one liners that include an end statement correctly
+  input: |
+    def foo; puts 'foo' end
+    def bar; puts 'bar' end
+  output: |
+    def foo; puts 'foo' end
+    def bar; puts 'bar' end
+
+- name: should handle if and unless statements that are terminated implicitly
+  input: |
+    def foo
+    bar = (1 + 2) if foobar
+    baz unless foobaz
+    Boo.new(:boo) rescue raise('Houston we have a problem')
+    end
+  output: |
+    def foo
+      bar = (1 + 2) if foobar
+      baz unless foobaz
+      Boo.new(:boo) rescue raise('Houston we have a problem')
+    end

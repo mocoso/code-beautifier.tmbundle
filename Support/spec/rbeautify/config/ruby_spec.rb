@@ -24,11 +24,11 @@ describe 'Ruby' do
       it { @matcher.parse_block_start('end Foo', nil, 0, 0).should be_nil }
 
       it { @current_block.parse_block_end('end', 0).should be_block_end_like(@current_block, 0, 'end', '') }
-      it { @current_block.parse_block_end('; end', 0).should be_block_end_like(@current_block, 0, '; end', '') }
+      it { @current_block.parse_block_end(';end', 0).should be_block_end_like(@current_block, 0, ';end', '') }
+      it { @current_block.parse_block_end('; end', 0).should be_block_end_like(@current_block, 1, ' end', '') }
       it { @current_block.parse_block_end('rescue', 0).should be_block_end_like(@current_block, 0, 'rescue', '') }
       it { @current_block.parse_block_end('ensure', 0).should be_block_end_like(@current_block, 0, 'ensure', '') }
       it { @current_block.parse_block_end('}', 0).should be_nil }
-      it { @current_block.parse_block_end('foo end', 0).should be_nil }
     end
 
     describe 'if' do
