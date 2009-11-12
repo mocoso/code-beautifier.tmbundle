@@ -389,7 +389,7 @@
       return "Foo#{" (#{bar})"}"
     end
 
-- name: should not non interpolsted content within regexes and strings and backticks
+- name: should not non interpolated content within regexes and strings and backticks
   input: |
     def foo
     @foo = [
