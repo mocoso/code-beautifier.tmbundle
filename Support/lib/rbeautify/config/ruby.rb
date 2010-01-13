@@ -79,7 +79,8 @@ unless RBeautify::Language.language(:ruby)
   ruby.add_matcher(:case,
                    /#{pre_keyword_boundary}case\b/,
                    /(^|;|\s)end\b/,
-                   :nest_except => [:double_quote, :regex, :backtick])
+                   :nest_except => [:double_quote, :regex, :backtick],
+                   :indent_size => 0)
 
   ruby.add_matcher(:inner_case,
                    /#{continue_statement_boundary}(when|else|then)\b/,

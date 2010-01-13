@@ -26,7 +26,7 @@
       if a then b = 1 else b = 2 end
     end
 
-- name: indent case when statement
+- name: indent not double indent case/when statement
   input: |
     case foo
     when 1
@@ -39,13 +39,13 @@
     end
   output: |
     case foo
-      when 1
-        bar = 'some string'
-      when 2
-        bar = 'some other string'
-      when 3 then bar = '3'
-      else
-        bar = '4'
+    when 1
+      bar = 'some string'
+    when 2
+      bar = 'some other string'
+    when 3 then bar = '3'
+    else
+      bar = '4'
     end
 
 - name: indent while statement
@@ -373,10 +373,10 @@
     end
   output: |
     case params[:do]
-      when "update_if"
-        update_if.if
-      when "update_do"
-        update_do.do
+    when "update_if"
+      update_if.if
+    when "update_do"
+      update_do.do
     end
 
 - name: should recognize interpolation and not match other content within double quotes
