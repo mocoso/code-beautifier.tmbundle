@@ -51,10 +51,10 @@ module RBeautify
   def RBeautify.beautify_file(path, backup = false)
     if(path == '-') # stdin source
       source = STDIN.read
-      print beautify_string(source,"stdin")
+      print beautify_string(:ruby, source)
     else # named file source
       source = File.read(path)
-      dest = beautify_string(source)
+      dest = beautify_string(:ruby, source)
       if(source != dest)
         if backup
           # make a backup copy
