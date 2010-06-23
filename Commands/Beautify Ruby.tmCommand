@@ -36,7 +36,7 @@ end
 	<key>name</key>
 	<string>Beautify Ruby</string>
 	<key>output</key>
-	<string>replaceSelectedText</string>
+	<string>replaceDocument</string>
 	<key>scope</key>
 	<string>source.ruby</string>
 	<key>uuid</key>
