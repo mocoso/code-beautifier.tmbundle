@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'spec'
 require 'ruby-debug'
+require 'yaml'
 require File.dirname(__FILE__) + '/../lib/rbeautify.rb'
 
 module RBeautifyMatchers
@@ -95,7 +96,6 @@ Spec::Runner.configure do |config|
 end
 
 def run_fixtures_for_language(language)
-
   fixtures = YAML.load_file(File.dirname(__FILE__) + "/fixtures/#{language}.yml")
 
   describe language do
