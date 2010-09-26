@@ -41,6 +41,7 @@ describe 'Ruby' do
 
       it { @matcher.parse_block_start('if foo', nil, 0, 0).should be_block_start_like(:if, 0, 'if', ' foo') }
       it { @matcher.parse_block_start('then foo = bar', nil, 0, 0).should be_block_start_like(:if, 0, 'then', ' foo = bar') }
+      it { @matcher.parse_block_start('if_foo', nil, 0, 0).should be_nil }
 
       it { @current_block.parse_block_end('end', 0).should be_block_end_like(@current_block, 0, 'end', '') }
       it { @current_block.parse_block_end('then', 0).should be_block_end_like(@current_block, 0, 'then', '') }
@@ -174,6 +175,15 @@ describe 'Ruby' do
 
       it { @current_block.parse_block_end('anything', 0).should be_block_end_like(@current_block, 8, '', '') }
       it { @current_block.parse_block_end('', 0).should be_block_end_like(@current_block, 0, '', '') }
+    end
+
+    describe 'begin' do
+      before(:each) do
+        @matcher = @ruby.matcher(:begin)
+      end
+
+      it { @matcher.parse_block_start('begin', nil, 0, 0).should be_block_start_like(:begin, 0, 'begin', '') }
+      it { @matcher.parse_block_start('beginning', nil, 0, 0).should be_nil }
     end
 
     describe 'regex' do
