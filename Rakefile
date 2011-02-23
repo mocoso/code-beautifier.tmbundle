@@ -1,12 +1,12 @@
 # RSpec support
 begin
-  require 'spec'
+  require 'rspec'
 rescue LoadError
   require 'rubygems'
-  require 'spec'
+  require 'rspec'
 end
 begin
-  require 'spec/rake/spectask'
+  require "rspec/core/rake_task"
 rescue LoadError
   puts <<-EOS
   To use rspec for testing you must install rspec gem:
@@ -15,22 +15,23 @@ rescue LoadError
   exit(0)
 end
 
-spec_common = Proc.new do |t|
-  t.spec_files = FileList['Support/spec/**/*/*_spec.rb']
+spec_common = Proc.new do |spec|
+  spec.pattern = 'Support/spec/**/*/*_spec.rb'
+  spec.rspec_opts = ['--backtrace']
 end
 
 task :default => :spec
 
 desc "Run all specs in spec directory"
-Spec::Rake::SpecTask.new(:spec) do |t|
-  spec_common.call(t)
+RSpec::Core::RakeTask.new(:spec) do |spec|
+  spec_common.call(spec)
 end
 
 namespace :spec do
-  desc "Run all specs in spec directory with RCov (excluding plugin specs)"
-  Spec::Rake::SpecTask.new(:rcov) do |t|
-    spec_common.call(t)
-    t.rcov = true
-    t.rcov_opts = ['-x', 'Support/spec/', '-T']
+  desc "Run all specs in spec directory with RCov"
+  RSpec::Core::RakeTask.new(:rcov) do |spec|
+    spec_common.call(spec)
+    spec.rcov = true
+    spec.rcov_opts = ['-x', 'Support/spec/', '-T']
   end
 end

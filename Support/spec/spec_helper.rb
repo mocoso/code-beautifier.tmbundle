@@ -1,5 +1,9 @@
-require 'rubygems'
-require 'spec'
+begin
+  require 'rspec'
+rescue LoadError
+  require 'rubygems'
+  require 'rspec'
+end
 require 'ruby-debug'
 require 'yaml'
 require File.dirname(__FILE__) + '/../lib/rbeautify.rb'
@@ -91,9 +95,10 @@ module RBeautifyMatchers
   end
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   config.include(RBeautifyMatchers)
 end
+
 
 def run_fixtures_for_language(language)
   fixtures = YAML.load_file(File.dirname(__FILE__) + "/fixtures/#{language}.yml")
