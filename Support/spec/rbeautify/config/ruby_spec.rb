@@ -185,6 +185,7 @@ describe 'Ruby' do
 
       it { @current_block.parse_block_end('rescue', 0).should be_block_end_like(@current_block, 0, 'rescue', '') }
       it { @current_block.parse_block_end('ensure', 0).should be_block_end_like(@current_block, 0, 'ensure', '') }
+      it { @current_block.parse_block_end('else', 0).should be_block_end_like(@current_block, 0, 'else', '') }
       it { @current_block.parse_block_end('end', 0).should be_block_end_like(@current_block, 0, 'end', '') }
     end
 
