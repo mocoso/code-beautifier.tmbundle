@@ -177,10 +177,15 @@ describe 'Ruby' do
     describe 'begin' do
       before(:each) do
         @matcher = @ruby.matcher(:begin)
+        @current_block = RBeautify::BlockStart.new(@matcher, nil, 0, 0, 'begin', '')
       end
 
       it { @matcher.parse_block_start('begin', nil, 0, 0).should be_block_start_like(:begin, 0, 'begin', '') }
       it { @matcher.parse_block_start('beginning', nil, 0, 0).should be_nil }
+
+      it { @current_block.parse_block_end('rescue', 0).should be_block_end_like(@current_block, 0, 'rescue', '') }
+      it { @current_block.parse_block_end('ensure', 0).should be_block_end_like(@current_block, 0, 'ensure', '') }
+      it { @current_block.parse_block_end('end', 0).should be_block_end_like(@current_block, 0, 'end', '') }
     end
 
     describe 'regex' do
