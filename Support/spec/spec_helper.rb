@@ -4,7 +4,6 @@ rescue LoadError
   require 'rubygems'
   require 'rspec'
 end
-require 'ruby-debug'
 require 'yaml'
 require File.dirname(__FILE__) + '/../lib/rbeautify.rb'
 
