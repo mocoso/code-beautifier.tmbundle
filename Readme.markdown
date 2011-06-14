@@ -26,7 +26,7 @@ The 'Beautify all changed' command relies on
  - The Grit gem being installed
 
         sudo gem sources -a http://gems.github.com/
-        sudo gem install mojombo-grit)
+        sudo gem install mojombo-grit
 
 ## KNOWN ISSUES
 
