@@ -59,8 +59,8 @@ describe RBeautify::BlockMatcher do
       end
 
       it 'should remove two blocks if top of stack ends implicitly' do
-        parent_block = RBeautify::BlockStart.new(@ruby.matcher(:standard), nil, 0, 0, 'class', ' Foo')
-        child_block = RBeautify::BlockStart.new(@ruby.matcher(:implicit_end), parent_block, 0, 0, 'private', '')
+        parent_block = RBeautify::BlockStart.new(@ruby.matcher(:case), nil, 0, 0, 'case', ' foo')
+        child_block = RBeautify::BlockStart.new(@ruby.matcher(:inner_case), parent_block, 0, 0, 'when', '2')
         RBeautify::BlockMatcher.parse(@ruby, child_block, 0, 'end', 0).should be_nil
       end
     end

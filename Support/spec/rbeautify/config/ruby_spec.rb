@@ -119,34 +119,6 @@ describe 'Ruby' do
       it { @current_block.parse_block_end('#', 0).should be_nil }
     end
 
-    describe 'implicit_end' do
-      before(:each) do
-        @matcher = @ruby.matcher(:implicit_end)
-        @current_block = RBeautify::BlockStart.new(@matcher, nil, 0, 0, '', '')
-      end
-
-      it { @matcher.should be_end_can_also_be_start}
-
-      it { @matcher.parse_block_start('private', nil, 0, 0).should be_block_start_like(:implicit_end, 0, 'private', '') }
-      it { @matcher.parse_block_start('protected', nil, 0, 0).should be_block_start_like(:implicit_end, 0, 'protected', '') }
-      it { @matcher.parse_block_start('a = 3', nil, 0, 0).should be_nil }
-
-      it { @current_block.parse_block_end('protected', 0).should be_block_end_like(@current_block, 0, 'protected', '') }
-      it { @current_block.parse_block_end('protected # some comment', 0).should be_block_end_like(@current_block, 0, 'protected # some comment', '') }
-      it { @current_block.parse_block_end('a = 3', 0).should be_nil }
-
-      it 'should return both if implicit end from next block in stack' do
-        surrounding_block = RBeautify::BlockStart.new(@ruby.matcher(:standard), nil, 0, 0, 'def', ' foo')
-        current_block = RBeautify::BlockStart.new(@matcher, surrounding_block, 0, 0, '', '')
-        current_block.parse_block_end('end', 0).should be_block_end_like(surrounding_block, 0, 'end', '')
-      end
-
-      it 'should return none if no implicit end from next block in stack' do
-        surrounding_block = RBeautify::BlockStart.new(@ruby.matcher(:standard), nil, 0, 0, 'def', ' foo')
-        @current_block.parse_block_end('a = 3', 0).should be_nil
-      end
-    end
-
     describe 'round_bracket' do
       before(:each) do
         @matcher = @ruby.matcher(:round_bracket)

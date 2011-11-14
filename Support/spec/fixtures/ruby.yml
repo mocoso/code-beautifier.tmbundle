@@ -193,30 +193,6 @@
       b = 5
     end
 
-- name: end indentation of implicit blocks when another implicit block starts or when surrounding block ends
-  input: |
-    class Foo
-    private
-    def method
-    b = 5
-    end
-    protected
-    def another_method
-    c = 5
-    end
-    end
-  output: |
-    class Foo
-      private
-        def method
-          b = 5
-        end
-      protected
-        def another_method
-          c = 5
-        end
-    end
-
 - name: not treat divison as start of regex
   input: |
     def foo
