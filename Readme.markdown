@@ -18,16 +18,6 @@ Otherwise download the [zip][] or [tarball][] and unpack it in ~/Library/Applica
 
 Then select 'Bundles > Bundle Editor > Reload Bundles' from Textmate's menus
 
-## Dependencies
-
-The 'Beautify all changed' command relies on
-
- - Your project using Git for source control
- - The Grit gem being installed
-
-        sudo gem sources -a http://gems.github.com/
-        sudo gem install mojombo-grit
-
 ## KNOWN ISSUES
 
  - Does recognize strings with custom delimiters
