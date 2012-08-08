@@ -1,5 +1,7 @@
 # Code Beautifier Textmate Bundle
 
+**Warning:** _I no longer use Textmate and so this is effectively abandonware_
+
 Textmate's indent functionality does a reasonable job of formatting your code BUT there is a great deal of room for improvement.
 
 Code Beautifier only supports Ruby at present but does improve upon Textmate's indent functionality, in particular it is better at indenting multiline statements and cleans up white space.
